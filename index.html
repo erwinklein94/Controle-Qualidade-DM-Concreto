@@ -1591,8 +1591,8 @@
           <p id="heroRuleText" style="display:none" aria-hidden="true"></p>
         </div>
         <div class="hero-actions">
-          <label class="btn btn-light" for="importCsvTop">Importar CSV</label>
-          <input type="file" id="importCsvTop" accept=".csv,text/csv" style="display:none" />
+          <label class="btn btn-light" for="importCsvTop">Importar XLSX</label>
+          <input type="file" id="importCsvTop" accept=".xlsx,.xls,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12" style="display:none" />
           <button class="btn btn-accent" id="exportPdfTop" type="button">Report / PDF</button>
           <button class="theme-toggle" id="themeToggle" type="button" aria-label="Ativar tema claro" title="Tema claro">☀</button>
         </div>
@@ -1648,9 +1648,9 @@
 
           <label class="start-card" for="importCsvStart">
             <span class="icon">↥</span>
-            <span><strong>Importar CSV da planilha</strong><span>Trazer dados da planilha e recalcular séries automaticamente.</span></span>
+            <span><strong>Importar planilha Excel</strong><span>Trazer dados da planilha e recalcular séries automaticamente.</span></span>
           </label>
-          <input type="file" id="importCsvStart" accept=".csv,text/csv" style="display:none" />
+          <input type="file" id="importCsvStart" accept=".xlsx,.xls,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12" style="display:none" />
         </div>
       </div>
     </section>
@@ -1764,7 +1764,7 @@
             <h2>Consulta de lotes</h2>
             <p>Pesquise por lote, pedido, projeto, ombreira, status ou fábrica.</p>
           </div>
-          <button class="btn btn-primary" id="exportCsvBtn">Exportar CSV</button>
+          <button class="btn btn-primary" id="exportCsvBtn">Exportar XLSX</button>
         </div>
         <div class="filters">
           <div class="filter-field">
@@ -1845,19 +1845,19 @@
           <div class="section-title">
             <div>
               <h2>Backup e exportação</h2>
-              <p>Use CSV para planilha. Use JSON para guardar um backup completo.</p>
+              <p>Use XLSX para planilha. Use JSON para guardar um backup completo.</p>
             </div>
           </div>
           <div class="modal-actions" style="justify-content:flex-start">
-            <label class="btn btn-primary" for="importCsvInput">Importar CSV da planilha</label>
-            <input type="file" id="importCsvInput" accept=".csv,text/csv" style="display:none" />
-            <button class="btn btn-outline" id="exportCsvConfig">Exportar CSV</button>
+            <label class="btn btn-primary" for="importCsvInput">Importar planilha Excel</label>
+            <input type="file" id="importCsvInput" accept=".xlsx,.xls,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12" style="display:none" />
+            <button class="btn btn-outline" id="exportCsvConfig">Exportar XLSX</button>
             <button class="btn btn-accent" id="exportBackupConfig">Backup JSON</button>
             <label class="btn btn-outline" for="importBackupInput">Importar JSON</label>
             <input type="file" id="importBackupInput" accept="application/json" style="display:none" />
           </div>
           <div class="import-note">
-            O importador lê o CSV exportado da planilha da Cavan/Conprem, identifica a linha de cabeçalho, normaliza projetos como FMT, Ferronorte, Malha Paulista Bitola Larga e Bitola Mista, ignora linhas sem produção na contagem e calcula séries históricas automaticamente.
+            O importador lê a planilha Excel da Cavan/Conprem em formato .xlsx, identifica a aba e a linha de cabeçalho, normaliza projetos como FMT, Ferronorte, Malha Paulista Bitola Larga e Bitola Mista, ignora linhas sem produção na contagem e calcula séries históricas automaticamente.
           </div>
         </div>
 
@@ -1932,6 +1932,7 @@
 
   <div class="toast" id="toast">Salvo.</div>
 
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script>
     const STORAGE_KEYS = {
       lots: "dm_lots_v3",
@@ -2458,7 +2459,7 @@
       const container = document.getElementById("alertsGrid");
       if (!groups.length) {
         container.className = "";
-        container.innerHTML = `<div class="empty"><strong>Nenhuma série ativa</strong>Importe o CSV da planilha para iniciar o acompanhamento automático.</div>`;
+        container.innerHTML = `<div class="empty"><strong>Nenhuma série ativa</strong>Importe a planilha Excel para iniciar o acompanhamento automático.</div>`;
         return;
       }
       container.className = "alert-grid";
@@ -2700,7 +2701,7 @@
             <div class="mini-kpi"><small>Dormentes</small><strong>0</strong></div>
             <div class="mini-kpi"><small>Ensaiar agora</small><strong>0</strong></div>
           </div>
-          <div class="empty"><strong>Nenhum lote neste período</strong>Importe o CSV da planilha ou altere as datas para visualizar os dados.</div>
+          <div class="empty"><strong>Nenhum lote neste período</strong>Importe a planilha Excel ou altere as datas para visualizar os dados.</div>
         `;
       } else {
         smart.innerHTML = `
@@ -2751,7 +2752,7 @@
 
       const seriesRows = getAllSeries().slice(0, 80);
       if (!seriesRows.length) {
-        series.innerHTML = `<div class="empty"><strong>Nenhuma série calculada</strong>Importe o CSV ou cadastre lotes para gerar as séries.</div>`;
+        series.innerHTML = `<div class="empty"><strong>Nenhuma série calculada</strong>Importe a planilha Excel ou cadastre lotes para gerar as séries.</div>`;
         return;
       }
       series.innerHTML = `
@@ -2768,7 +2769,7 @@
               const favorableTestInfo = favorableTestInfoForGroup(row);
               const testDateCell = favorableTestInfo.favorable
                 ? favorableTestInfo.date
-                  ? `<strong>${formatDateBr(favorableTestInfo.date)}</strong><div class="tiny muted">CSV: favorável ao ensaio</div>`
+                  ? `<strong>${formatDateBr(favorableTestInfo.date)}</strong><div class="tiny muted">XLSX: favorável ao ensaio</div>`
                   : `<span class="badge warning">Favorável, sem data</span>`
                 : `<span class="badge gray">--</span>`;
               return `<tr>
@@ -3312,7 +3313,7 @@
       URL.revokeObjectURL(url);
     }
 
-    function exportCsv() {
+    function buildExportData() {
       const headers = [
         "fabrica", "cidade_uf", "pista", "numero_pedido", "lote", "projeto", "tipo_dormente",
         "total_producao", "data_fabricacao", "cura_14_dias", "cura_28_dias", "com_usp", "usp_lote",
@@ -3338,8 +3339,24 @@
           lot.testEligibility, lot.testDate, lot.status, lot.reason, lot.cycle
         ];
       });
-      const content = [headers, ...rows].map(row => row.map(csvEscape).join(";")).join("\n");
-      download(`controle-dormentes-${today()}.csv`, content, "text/csv;charset=utf-8");
+      return { headers, rows };
+    }
+
+    function exportCsv() {
+      exportXlsx();
+    }
+
+    function exportXlsx() {
+      if (!window.XLSX) {
+        alert("Não consegui carregar o leitor de Excel. Verifique a conexão com a internet ou abra a página novamente.");
+        return;
+      }
+      const { headers, rows } = buildExportData();
+      const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+      worksheet["!cols"] = headers.map(header => ({ wch: Math.min(Math.max(String(header).length + 2, 12), 34) }));
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Lotes");
+      XLSX.writeFile(workbook, `controle-dormentes-${today()}.xlsx`);
     }
 
     function formatPercent(value, digits = 2) {
@@ -3858,23 +3875,50 @@
     }
 
     function parseCsvNumber(value) {
+      if (typeof value === "number") return Number.isFinite(value) ? value : 0;
       const text = String(value || "").trim();
       if (!text || text === "_" || text.includes("#REF")) return 0;
-      const normalized = text.replace(/\./g, "").replace(",", ".").replace(/[^0-9.-]/g, "");
+      let normalized = text.replace(/\s+/g, "").replace(/[^0-9,.-]/g, "");
+      const lastComma = normalized.lastIndexOf(",");
+      const lastDot = normalized.lastIndexOf(".");
+      if (lastComma >= 0 && lastDot >= 0) {
+        normalized = lastComma > lastDot
+          ? normalized.replace(/\./g, "").replace(",", ".")
+          : normalized.replace(/,/g, "");
+      } else if (lastComma >= 0) {
+        normalized = normalized.replace(",", ".");
+      } else if (lastDot >= 0) {
+        const parts = normalized.split(".");
+        if (parts.length > 2 || (parts.length === 2 && parts[1].length === 3 && parts[0].length > 1)) {
+          normalized = normalized.replace(/\./g, "");
+        }
+      }
       const parsed = Number(normalized);
       return Number.isFinite(parsed) ? parsed : 0;
     }
 
     function parseCsvDate(value) {
+      if (value instanceof Date && !Number.isNaN(value.getTime())) {
+        return value.toISOString().slice(0, 10);
+      }
       const text = String(value || "").trim();
       if (!text || text === "_") return "";
       if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
-      const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
-      if (!match) return "";
-      const day = match[1].padStart(2, "0");
-      const month = match[2].padStart(2, "0");
-      const year = match[3].length === 2 ? `20${match[3]}` : match[3];
-      return `${year}-${month}-${day}`;
+      const isoWithTime = text.match(/^(\d{4})-(\d{2})-(\d{2})[T\s]/);
+      if (isoWithTime) return `${isoWithTime[1]}-${isoWithTime[2]}-${isoWithTime[3]}`;
+      const brMatch = text.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+      if (brMatch) {
+        const day = brMatch[1].padStart(2, "0");
+        const month = brMatch[2].padStart(2, "0");
+        const year = brMatch[3].length === 2 ? `20${brMatch[3]}` : brMatch[3];
+        return `${year}-${month}-${day}`;
+      }
+      const serial = Number(text.replace(",", "."));
+      if (Number.isFinite(serial) && serial > 20000 && serial < 80000) {
+        const date = new Date(Math.round((serial - 25569) * 86400 * 1000));
+        return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+      }
+      return "";
     }
 
     function normalizeCsvProject(projectRaw, sleeperType) {
@@ -3932,13 +3976,50 @@
       return lots;
     }
 
-    function importCsv(file) {
+    function rowsFromWorksheet(sheet) {
+      return XLSX.utils.sheet_to_json(sheet, {
+        header: 1,
+        defval: "",
+        blankrows: false,
+        raw: false,
+        dateNF: "dd/mm/yyyy"
+      }).map(row => row.map(cell => String(cell ?? "").trim()));
+    }
+
+    function workbookRowsWithHeader(arrayBuffer) {
+      if (!window.XLSX) {
+        throw new Error("Biblioteca XLSX não carregada");
+      }
+      const workbook = XLSX.read(arrayBuffer, {
+        type: "array",
+        cellDates: true,
+        cellText: true,
+        cellNF: true
+      });
+      let firstUsable = null;
+      for (const sheetName of workbook.SheetNames) {
+        const sheet = workbook.Sheets[sheetName];
+        if (!sheet || !sheet["!ref"]) continue;
+        const rows = rowsFromWorksheet(sheet).filter(row => row.some(cell => String(cell).trim() !== ""));
+        if (!rows.length) continue;
+        if (!firstUsable) firstUsable = { sheetName, rows };
+        const headerIndex = rows.findIndex(row => row.some(cell => normalizeText(cell) === "LOTE") && row.some(cell => normalizeText(cell).includes("TOTAL DA PRODUCAO")));
+        if (headerIndex >= 0) return { sheetName, rows, headerIndex };
+      }
+      if (!firstUsable) throw new Error("Planilha vazia");
+      return { ...firstUsable, headerIndex: -1 };
+    }
+
+    function importSpreadsheet(file) {
       if (!file) return;
+      if (!/\.(xlsx|xls|xlsm)$/i.test(file.name || "")) {
+        alert("Use uma planilha Excel em formato .xlsx, .xls ou .xlsm.");
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => {
         try {
-          const rows = parseCsvText(String(reader.result || ""));
-          const headerIndex = rows.findIndex(row => row.some(cell => normalizeText(cell) === "LOTE") && row.some(cell => normalizeText(cell).includes("TOTAL DA PRODUCAO")));
+          const { rows, sheetName, headerIndex } = workbookRowsWithHeader(reader.result);
           if (headerIndex < 0) throw new Error("Cabeçalho não encontrado");
           const dataRows = rows.slice(headerIndex + 1);
           const headers = rows[headerIndex] || [];
@@ -3975,7 +4056,7 @@
             const testDate = parseCsvDate(csvCell(row, testDateIndex));
             imported.push({
               ...EMPTY_LOT,
-              id: id("csv"),
+              id: id("xlsx"),
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
               factoryId: "cavan",
@@ -4027,12 +4108,13 @@
               status: normalizeCsvStatus(row[43], productionTotal),
               reason: String(row[45] || "").trim(),
               importWarning,
+              sourceSheet: sheetName,
               sourceRow: headerIndex + index + 2
             });
           });
           if (!imported.length) throw new Error("Nenhum lote válido");
           const withCycles = assignImportedCycles(imported);
-          if (!confirm(`Importei ${withCycles.length} linhas do CSV. Deseja substituir os lotes atuais por estes dados?\n\nOK = substituir tudo.\nCancelar = somar aos dados atuais.`)) {
+          if (!confirm(`Importei ${withCycles.length} linhas da planilha Excel, aba "${sheetName}". Deseja substituir os lotes atuais por estes dados?\n\nOK = substituir tudo.\nCancelar = somar aos dados atuais.`)) {
             state.lots = [...withCycles, ...state.lots];
           } else {
             state.lots = withCycles;
@@ -4041,12 +4123,12 @@
           ensureCsvProjectsAndFactory(withCycles);
           renderAll();
           switchTab("painel");
-          showToast("CSV importado e séries recalculadas.");
+          showToast("Planilha Excel importada e séries recalculadas.");
         } catch (error) {
-          alert("Não consegui importar esse CSV. Verifique se ele foi exportado da planilha de controle e se usa separador ponto e vírgula (;).");
+          alert("Não consegui importar essa planilha Excel. Verifique se o arquivo está em .xlsx/.xls e se possui a aba da planilha de controle com as colunas esperadas.");
         }
       };
-      reader.readAsText(file, "windows-1252");
+      reader.readAsArrayBuffer(file);
     }
 
     function importBackup(file) {
@@ -4204,14 +4286,14 @@
         persist();
         renderReportOptions();
       });
-      document.getElementById("exportCsvBtn").addEventListener("click", exportCsv);
-      document.getElementById("exportCsvConfig").addEventListener("click", exportCsv);
+      document.getElementById("exportCsvBtn").addEventListener("click", exportXlsx);
+      document.getElementById("exportCsvConfig").addEventListener("click", exportXlsx);
       document.getElementById("themeToggle").addEventListener("click", toggleTheme);
       document.getElementById("exportBackupConfig").addEventListener("click", exportBackup);
       document.getElementById("importBackupInput").addEventListener("change", event => importBackup(event.target.files[0]));
-      document.getElementById("importCsvInput").addEventListener("change", event => importCsv(event.target.files[0]));
-      document.getElementById("importCsvTop").addEventListener("change", event => importCsv(event.target.files[0]));
-      document.getElementById("importCsvStart").addEventListener("change", event => importCsv(event.target.files[0]));
+      document.getElementById("importCsvInput").addEventListener("change", event => importSpreadsheet(event.target.files[0]));
+      document.getElementById("importCsvTop").addEventListener("change", event => importSpreadsheet(event.target.files[0]));
+      document.getElementById("importCsvStart").addEventListener("change", event => importSpreadsheet(event.target.files[0]));
 
       document.getElementById("saveConfigBtn").addEventListener("click", saveConfig);
       document.getElementById("restoreDemoBtn").addEventListener("click", restoreDemo);
