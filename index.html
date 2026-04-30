@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Controle de Inspeção de Dormentes</title>
+  <title>Sistema de Controle Técnico de Dormentes | Rumo</title>
+  <meta name="theme-color" content="#003b68" />
   <style>
 
     :root {
@@ -1569,13 +1570,151 @@
       .modal { padding: 18px; }
     }
 
+
+    /* Camada visual institucional: acabamento corporativo e leitura executiva. */
+    :root {
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --ink: #142f43;
+      --muted: #5f7382;
+      --line: #d9e3ea;
+      --navy: #003b68;
+      --navy-2: #002f55;
+      --navy-3: #08283e;
+      --blue: #0a5f91;
+      --cyan: #0b8fc2;
+      --green-2: #12b981;
+      --yellow: #12b981;
+      --red: #0e4a70;
+      --red-bg: #f3f8fb;
+      --amber: #0b7ea6;
+      --amber-bg: #eef8fc;
+      --ok: #03966f;
+      --ok-bg: #effaf5;
+      --shadow: 0 18px 46px rgba(20, 47, 67, .10);
+      --shadow-soft: 0 10px 28px rgba(20, 47, 67, .07);
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: linear-gradient(180deg, #f8fafc 0%, #f3f6f8 52%, #eef3f7 100%) !important;
+      color: var(--ink) !important;
+      letter-spacing: -.005em;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .topbar { display:block !important; background:#06253a; color:rgba(255,255,255,.86); border-bottom:1px solid rgba(255,255,255,.08); font-size:12px; letter-spacing:.04em; text-transform:uppercase; font-weight:850; }
+    .topbar .shell { min-height:36px; display:flex; align-items:center; justify-content:space-between; gap:18px; }
+
+    .hero { background: linear-gradient(135deg, #06253a 0%, #003b68 62%, #0a6fa3 100%) !important; border-bottom:4px solid var(--green-2); box-shadow:0 16px 42px rgba(0,31,54,.18); }
+    .hero::before { opacity:.35 !important; }
+    .hero-inner { padding:18px 0 !important; }
+    .brand-row { min-height:92px !important; padding:0 !important; background:transparent !important; border:0 !important; box-shadow:none !important; backdrop-filter:none !important; clip-path:none !important; grid-template-columns:auto minmax(280px,1fr) auto !important; gap:24px !important; }
+    .brand { min-width:174px !important; min-height:70px; padding:12px 18px; background:rgba(255,255,255,.96); border:1px solid rgba(255,255,255,.38); border-radius:16px; box-shadow:0 14px 30px rgba(0,22,42,.16); }
+    .brand-logo { width:148px !important; max-width:180px !important; filter:none !important; }
+    .header-copy { padding-left:24px !important; border-left:1px solid rgba(255,255,255,.22) !important; gap:7px !important; }
+    .header-copy .eyebrow { color:rgba(255,255,255,.70) !important; letter-spacing:.16em !important; font-size:11px !important; }
+    .header-copy h1 { font-size:clamp(27px,2.3vw,39px) !important; line-height:1.02 !important; letter-spacing:-.045em !important; font-weight:950 !important; }
+    .header-copy p { display:block !important; max-width:760px !important; color:rgba(255,255,255,.80) !important; font-size:14px !important; line-height:1.5 !important; }
+    .hero-actions { gap:10px !important; padding:8px !important; background:rgba(255,255,255,.10) !important; border:1px solid rgba(255,255,255,.18) !important; border-radius:16px !important; clip-path:none !important; overflow:visible !important; }
+    .hero-actions .btn, .theme-toggle { min-height:42px !important; padding:10px 15px !important; border-radius:11px !important; border:1px solid rgba(255,255,255,.22) !important; font-size:13px !important; }
+    .theme-toggle { width:44px !important; background:rgba(255,255,255,.12) !important; color:#fff !important; }
+
+    .tabs { background:rgba(255,255,255,.94) !important; border-bottom:1px solid var(--line) !important; box-shadow:0 10px 28px rgba(20,47,67,.06); }
+    .tabs .shell { gap:6px !important; padding-top:10px !important; padding-bottom:10px !important; }
+    .tab-btn { background:transparent !important; border:0 !important; border-radius:12px !important; clip-path:none !important; box-shadow:none !important; color:#5d7280 !important; padding:11px 15px !important; font-size:13px !important; letter-spacing:.01em; }
+    .tab-btn:hover { background:#eef4f7 !important; color:var(--navy) !important; transform:none !important; box-shadow:none !important; }
+    .tab-btn.active { background:#e8f2f7 !important; color:var(--navy) !important; box-shadow:inset 0 -2px 0 var(--green-2) !important; }
+
+    main { padding:34px 0 64px !important; }
+    .section-card, .insight-card, .history-card, .modal, .kpi, .alert-card, .form-section, .table-wrap, .start-card, .mini-kpi, .quality-item, .metric, .lot-list, .empty, .modal-summary, .import-note, .mini-item, input, select, textarea, .btn, .badge, .progress, .issue-pill, .test-lot-callout, .test-lot-chip, .test-lot-table-badge, .form-footer, .report-note { clip-path:none !important; }
+    .section-card, .insight-card, .history-card, .modal, .kpi, .alert-card, .form-section, .table-wrap { background:var(--panel) !important; border:1px solid var(--line) !important; border-radius:var(--radius) !important; box-shadow:var(--shadow-soft) !important; }
+    .section-card { padding:28px !important; }
+    .start-panel { padding:34px !important; border-top:5px solid var(--navy) !important; }
+    .start-panel::after, .kpi::before, .alert-card::after, .form-footer::after { display:none !important; }
+    .start-intro { max-width:930px !important; margin-bottom:24px !important; }
+    .start-intro h2, .section-title h2 { font-weight:920 !important; letter-spacing:-.04em !important; color:var(--navy-3) !important; }
+    .start-intro p, .section-title p, .insight-card p, .form-section p { color:var(--muted) !important; line-height:1.6 !important; }
+    .start-grid { gap:16px !important; }
+    .start-card { min-height:172px !important; padding:23px !important; background:#fff !important; color:var(--ink) !important; border:1px solid var(--line) !important; border-radius:18px !important; box-shadow:0 14px 34px rgba(20,47,67,.08) !important; justify-content:flex-start !important; position:relative; overflow:hidden; }
+    .start-card::after { content:""; position:absolute; inset:auto 0 0 0; height:4px; background:linear-gradient(90deg,var(--navy),var(--green-2)); opacity:.78; }
+    .start-card:hover { transform:translateY(-2px) !important; border-color:#b8cbd8 !important; box-shadow:0 18px 42px rgba(20,47,67,.12) !important; }
+    .start-card.highlight, .start-card.primary-action { background:#fff !important; color:var(--ink) !important; border-color:#c5d7e2 !important; }
+    .start-card .icon { width:42px !important; height:42px !important; border-radius:12px !important; background:#e8f2f7 !important; color:var(--navy) !important; font-size:13px !important; font-weight:950 !important; letter-spacing:.05em; box-shadow:none !important; }
+    .start-card.primary-action .icon { background:var(--navy) !important; color:#fff !important; }
+    .start-card strong { font-size:18px !important; color:var(--navy-3) !important; letter-spacing:-.02em !important; }
+    .start-card span:last-child { color:var(--muted) !important; opacity:1 !important; font-size:13px !important; }
+
+    .kpi-grid { gap:14px !important; margin-bottom:20px !important; }
+    .kpi { padding:20px !important; border-radius:16px !important; box-shadow:0 12px 26px rgba(20,47,67,.07) !important; border-top:4px solid #dce8ef !important; }
+    .kpi:nth-child(2n) { border-top-color:#c8dce8 !important; } .kpi:nth-child(3n) { border-top-color:#c9ecdd !important; } .kpi.danger { border-top-color:var(--navy) !important; }
+    .kpi small, .mini-kpi small, .metric small, .filter-field label, .field label { color:#627887 !important; letter-spacing:.06em; text-transform:uppercase; font-weight:850 !important; }
+    .kpi strong { font-size:28px !important; color:var(--navy-3) !important; }
+    .section-title { align-items:center !important; margin-bottom:20px !important; padding-bottom:18px; border-bottom:1px solid #edf2f5; }
+
+    .btn { border-radius:12px !important; padding:12px 16px !important; font-weight:900 !important; box-shadow:none !important; border:1px solid transparent !important; }
+    .btn:hover { transform:translateY(-1px) !important; }
+    .btn-primary { background:var(--navy) !important; color:#fff !important; border-color:var(--navy) !important; }
+    .btn-primary:hover { background:var(--navy-2) !important; }
+    .btn-accent { background:var(--green-2) !important; color:#08283e !important; border-color:var(--green-2) !important; }
+    .btn-light { background:rgba(255,255,255,.96) !important; color:var(--navy) !important; }
+    .btn-outline { background:#fff !important; color:var(--navy) !important; border-color:var(--line) !important; }
+    .btn-danger { background:#f6f8fa !important; color:var(--navy) !important; border-color:var(--line) !important; }
+
+    .alert-card { border-radius:18px !important; padding:20px !important; box-shadow:0 12px 30px rgba(20,47,67,.08) !important; }
+    .alert-card::before { width:5px !important; background:var(--green) !important; }
+    .alert-card.danger::before, .alert-card.warning::before { background:var(--navy) !important; }
+    .badge { border-radius:999px !important; padding:7px 11px !important; letter-spacing:.04em; }
+    .progress { height:10px !important; border-radius:999px !important; border:0 !important; background:#edf3f6 !important; }
+    .progress span { border-radius:inherit !important; }
+    .metric, .mini-kpi, .quality-item, .lot-list, .modal-summary, .import-note, .mini-item { border-radius:14px !important; background:#f8fafc !important; border:1px solid #e0e9ef !important; }
+    .insight-grid { grid-template-columns:1fr !important; gap:16px !important; }
+    .insight-card { padding:24px !important; }
+    .insight-card h3 { font-size:20px !important; margin-bottom:6px !important; color:var(--navy-3) !important; }
+
+    input, select, textarea { background:#fff !important; border:1px solid #cfdde6 !important; border-radius:12px !important; color:var(--ink) !important; padding:12px 13px !important; }
+    input:focus, select:focus, textarea:focus { border-color:#80b7d6 !important; box-shadow:0 0 0 4px rgba(0,59,104,.10) !important; }
+    .form-section { background:#f8fafc !important; padding:21px !important; border-radius:16px !important; }
+    .form-footer { background:linear-gradient(135deg,var(--navy),var(--navy-2)) !important; border-radius:16px !important; }
+    .table-wrap { border-radius:18px !important; overflow:auto !important; }
+    table { border-collapse:separate !important; border-spacing:0 !important; }
+    th { background:#f1f5f8 !important; color:#657985 !important; font-size:11px !important; }
+    td { border-bottom:1px solid #e7eef2 !important; color:#253f51 !important; }
+    tr:hover td { background:#f8fbfd !important; }
+    .toast { border-radius:14px !important; clip-path:none !important; background:var(--navy) !important; box-shadow:0 18px 40px rgba(0,31,54,.22) !important; }
+
+    body.dark-theme { --bg:#0b1720; --panel:#101f2a; --ink:#eef5f8; --muted:#a9bac6; --line:rgba(166,190,204,.22); --navy:#71bee7; --navy-2:#4a9dca; --navy-3:#eef5f8; --green-2:#2fd59a; --shadow-soft:0 10px 28px rgba(0,0,0,.20); background:linear-gradient(180deg,#08131b 0%,#0b1720 62%,#0e1d28 100%) !important; }
+    body.dark-theme .topbar { background:#061018 !important; }
+    body.dark-theme .hero { background:linear-gradient(135deg,#061018,#0b2537 62%,#0f425f) !important; }
+    body.dark-theme .tabs { background:rgba(12,24,33,.95) !important; border-bottom-color:var(--line) !important; }
+    body.dark-theme .tab-btn { color:#a9bac6 !important; }
+    body.dark-theme .tab-btn:hover { background:rgba(255,255,255,.06) !important; color:#eef5f8 !important; }
+    body.dark-theme .tab-btn.active { background:rgba(113,190,231,.12) !important; color:#eef5f8 !important; }
+    body.dark-theme .section-card, body.dark-theme .insight-card, body.dark-theme .history-card, body.dark-theme .modal, body.dark-theme .kpi, body.dark-theme .alert-card, body.dark-theme .form-section, body.dark-theme .table-wrap, body.dark-theme .start-card, body.dark-theme .mini-kpi, body.dark-theme .quality-item, body.dark-theme .metric, body.dark-theme .mini-item, body.dark-theme .modal-summary, body.dark-theme .import-note, body.dark-theme .lot-list, body.dark-theme .empty { background:var(--panel) !important; border-color:var(--line) !important; }
+    body.dark-theme .start-card span:last-child, body.dark-theme .section-title p, body.dark-theme .start-intro p, body.dark-theme .insight-card p, body.dark-theme .form-section p, body.dark-theme .muted, body.dark-theme .tiny { color:var(--muted) !important; }
+    body.dark-theme input, body.dark-theme select, body.dark-theme textarea { background:#0c1a24 !important; color:#eef5f8 !important; border-color:rgba(166,190,204,.28) !important; }
+    body.dark-theme th { background:#142632 !important; color:#a9bac6 !important; }
+    body.dark-theme td { color:#dbe7ed !important; border-bottom-color:rgba(166,190,204,.15) !important; }
+    body.dark-theme tr:hover td { background:rgba(255,255,255,.04) !important; }
+    body.dark-theme .btn-outline, body.dark-theme .btn-light, body.dark-theme .btn-danger { background:#132633 !important; color:#eef5f8 !important; border-color:var(--line) !important; }
+    body.dark-theme .btn-primary { background:#71bee7 !important; color:#061018 !important; border-color:#71bee7 !important; }
+    body.dark-theme .btn-accent { background:#2fd59a !important; color:#061018 !important; border-color:#2fd59a !important; }
+    body.dark-theme .brand { background:rgba(255,255,255,.94) !important; }
+
+    @media (max-width:1120px) { .brand-row { grid-template-columns:auto 1fr !important; } .hero-actions { grid-column:1 / -1 !important; justify-self:start !important; } }
+    @media (max-width:820px) { .topbar .shell { align-items:flex-start; flex-direction:column; gap:2px; padding-top:8px; padding-bottom:8px; } .brand-row { gap:14px !important; } .brand { min-width:150px !important; } .header-copy { padding-left:14px !important; } .hero-actions { width:100% !important; overflow-x:auto !important; justify-content:flex-start !important; } .section-card { padding:22px !important; } .start-panel { padding:24px !important; } }
+    @media (max-width:520px) { .brand-row { grid-template-columns:1fr !important; } .brand { width:fit-content; } .header-copy { border-left:0 !important; padding-left:0 !important; } .header-copy h1 { font-size:27px !important; } }
+
   </style>
 </head>
-<body class="dark-theme">
+<body>
   <div class="topbar">
     <div class="shell">
-      <span>Controle de inspeção de dormentes de concreto</span>
-      <span>Rastreabilidade • produção • ensaios de liberação</span>
+      <span>Sistema institucional de controle técnico</span>
+      <span>Rastreabilidade • Produção • Ensaios • Relatórios</span>
     </div>
   </div>
 
@@ -1586,14 +1725,14 @@
           <img class="brand-logo" src="./rumologo.png" alt="Rumo" />
         </div>
         <div class="header-copy">
-          <div class="eyebrow">Controle técnico</div>
-          <h1>Dormentes, lotes e ensaios</h1>
-          <p id="heroRuleText" style="display:none" aria-hidden="true"></p>
+          <div class="eyebrow">Rumo • Engenharia e Qualidade</div>
+          <h1>Controle de Inspeção de Dormentes</h1>
+          <p id="heroRuleText">Gestão técnica de produção, rastreabilidade e ensaios a partir de planilhas Excel.</p>
         </div>
         <div class="hero-actions">
-          <label class="btn btn-light" for="importCsvTop">Importar XLSX</label>
+          <label class="btn btn-light" for="importCsvTop">Importar Excel</label>
           <input type="file" id="importCsvTop" accept=".xlsx,.xls,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12" style="display:none" />
-          <button class="btn btn-accent" id="exportPdfTop" type="button">Report / PDF</button>
+          <button class="btn btn-accent" id="exportPdfTop" type="button">Gerar relatório</button>
           <button class="theme-toggle" id="themeToggle" type="button" aria-label="Ativar tema claro" title="Tema claro">☀</button>
         </div>
       </div>
@@ -1602,13 +1741,13 @@
 
   <nav class="tabs">
     <div class="shell">
-      <button class="tab-btn active" data-tab="inicio">⌂ Início</button>
-      <button class="tab-btn" data-tab="painel">▣ Painel</button>
-      <button class="tab-btn" data-tab="report">▤ Report</button>
-      <button class="tab-btn" data-tab="cadastro">＋ Cadastrar lote</button>
-      <button class="tab-btn" data-tab="lotes">☷ Lotes</button>
-      <button class="tab-btn" data-tab="ensaios">✓ Ensaios</button>
-      <button class="tab-btn" data-tab="config">⚙ Configurações</button>
+      <button class="tab-btn active" data-tab="inicio">Início</button>
+      <button class="tab-btn" data-tab="painel">Painel</button>
+      <button class="tab-btn" data-tab="report">Relatório</button>
+      <button class="tab-btn" data-tab="cadastro">Cadastrar lote</button>
+      <button class="tab-btn" data-tab="lotes">Lotes</button>
+      <button class="tab-btn" data-tab="ensaios">Ensaios</button>
+      <button class="tab-btn" data-tab="config">Configurações</button>
     </div>
   </nav>
 
@@ -1616,39 +1755,39 @@
     <section id="inicio" class="view active">
       <div class="section-card start-panel">
         <div class="start-intro">
-          <h2>O que você quer fazer agora?</h2>
-          <p>Escolha uma opção para ir direto ao fluxo correto: cadastro de lote, resultado de ensaio, consulta, painel ou importação de dados.</p>
+          <h2>Central de operação</h2>
+          <p>Acesse rapidamente os principais fluxos de controle: cadastro, ensaios, consulta de lotes, painel executivo e importação de planilhas Excel.</p>
         </div>
 
         <div class="start-grid">
           <button class="start-card highlight primary-action" type="button" data-tab-target="cadastro">
-            <span class="icon">＋</span>
+            <span class="icon">01</span>
             <span><strong>Cadastrar lote</strong><span>Adicionar produção, fábrica, projeto, datas, ombreiras, USP e status.</span></span>
           </button>
 
           <button class="start-card primary-action" type="button" data-start-workflow="ensaio">
-            <span class="icon">✓</span>
-            <span><strong>Cadastrar resultado de ensaio de dormente</strong><span>Registrar aprovação, reprovação, iAuditor e fechar a série ativa.</span></span>
+            <span class="icon">02</span>
+            <span><strong>Registrar ensaio técnico</strong><span>Informar aprovação, reprovação, evidência iAuditor e encerramento da série ativa.</span></span>
           </button>
 
           <button class="start-card primary-action" type="button" data-tab-target="ensaios">
-            <span class="icon">✓</span>
-            <span><strong>Ensaios</strong><span>Consultar e acompanhar os ensaios registrados.</span></span>
+            <span class="icon">03</span>
+            <span><strong>Ensaios</strong><span>Consultar histórico, evidências e status das séries avaliadas.</span></span>
           </button>
 
           <button class="start-card" type="button" data-tab-target="lotes">
-            <span class="icon">☷</span>
-            <span><strong>Consultar lotes</strong><span>Pesquisar por lote, pedido, fábrica, projeto, ombreira ou status.</span></span>
+            <span class="icon">04</span>
+            <span><strong>Consultar lotes</strong><span>Pesquisar por lote, pedido, fábrica, projeto, ombreira, USP ou status.</span></span>
           </button>
 
           <button class="start-card" type="button" data-tab-target="painel">
-            <span class="icon">▣</span>
-            <span><strong>Ver painel e alertas</strong><span>Acompanhar séries, limites de 2.000 dormentes ou 10 lotes e pendências.</span></span>
+            <span class="icon">05</span>
+            <span><strong>Painel de controle</strong><span>Acompanhar produção, séries ativas, limites técnicos e pendências de avaliação.</span></span>
           </button>
 
           <label class="start-card" for="importCsvStart">
-            <span class="icon">↥</span>
-            <span><strong>Importar planilha Excel</strong><span>Trazer dados da planilha e recalcular séries automaticamente.</span></span>
+            <span class="icon">06</span>
+            <span><strong>Importar planilha Excel</strong><span>Ler planilhas .xlsx/.xls e recalcular indicadores técnicos automaticamente.</span></span>
           </label>
           <input type="file" id="importCsvStart" accept=".xlsx,.xls,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12" style="display:none" />
         </div>
@@ -1664,7 +1803,7 @@
             <h2>Controle de lotes/séries para ensaios</h2>
             <p>Cada cartão representa a série ativa. Quando o ensaio é registrado, a série fecha e a próxima contagem começa do zero.</p>
           </div>
-          <button class="btn btn-primary" data-tab-target="cadastro">＋ Novo lote</button>
+          <button class="btn btn-primary" data-tab-target="cadastro">Novo lote</button>
         </div>
         <div id="alertsGrid" class="alert-grid"></div>
       </div>
@@ -1706,7 +1845,7 @@
       <div class="section-card">
         <div class="section-title">
           <div>
-            <h2>Report</h2>
+            <h2>Relatório executivo</h2>
             <p>Configure o recorte dos dados que entrarão no PDF: fábrica, projeto e período de fabricação. O período é preenchido automaticamente com a semana mais recente dos dados.</p>
           </div>
           <button class="btn btn-accent" id="exportPdfReportBtn" type="button">Exportar PDF</button>
@@ -1748,7 +1887,7 @@
       <div class="section-card">
         <div class="section-title">
           <div>
-            <h2 id="formTitle">Cadastrar novo lote</h2>
+            <h2 id="formTitle">Cadastro de lote</h2>
             <p>Preencha os dados do lote. Os campos de cura e ruptura são sugeridos automaticamente a partir da data de fabricação quando estiverem vazios.</p>
           </div>
           <button class="btn btn-outline" id="cancelEditBtn" style="display:none">Cancelar edição</button>
@@ -2436,7 +2575,8 @@
     }
 
     function renderHeroRule() {
-      document.getElementById("heroRuleText").textContent = "";
+      const heroRule = document.getElementById("heroRuleText");
+      if (heroRule) heroRule.textContent = "Gestão técnica de produção, rastreabilidade e ensaios a partir de planilhas Excel.";
     }
 
     function renderKpis() {
@@ -4235,7 +4375,7 @@
     }
 
     function initTheme() {
-      const savedTheme = localStorage.getItem("dm_theme_v1") || "dark";
+      const savedTheme = localStorage.getItem("dm_theme_v1") || "light";
       applyTheme(savedTheme);
     }
 
