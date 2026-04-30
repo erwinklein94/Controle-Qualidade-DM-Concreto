@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CQ Dormentes | Controle de Qualidade e Produção</title>
-  <meta name="description" content="Painel de controle de qualidade e produção de dormentes de concreto com importação CSV e relatório PDF." />
+  <title>CQ Dormentes | Leitor XLSX</title>
+  <meta name="description" content="Painel de controle de qualidade de dormentes com leitura direta de planilhas Excel .xlsx e relatório PDF." />
 
   <!-- Bibliotecas via CDN: funcionam direto no GitHub Pages -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
@@ -27,9 +27,6 @@
       --green-2: #00b884;
       --soft: #e7f9ff;
       --soft-2: #f8fdff;
-      --danger: #002f55;
-      --warning: #08a9df;
-      --ok: #00b884;
       --shadow: 0 22px 60px rgba(0, 59, 104, .13);
       --shadow-soft: 0 12px 32px rgba(0, 59, 104, .08);
       --notch: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px));
@@ -50,8 +47,6 @@
       --green-2: #00d866;
       --soft: #0a3a5c;
       --soft-2: #082f4c;
-      --danger: #39c6ee;
-      --warning: #00d866;
       --shadow: 0 22px 60px rgba(0, 0, 0, .28);
       --shadow-soft: 0 12px 32px rgba(0, 0, 0, .20);
     }
@@ -77,7 +72,6 @@
     button, input, select { font: inherit; }
     button { cursor: pointer; }
     canvas { max-width: 100% !important; }
-
     .shell { width: min(1440px, calc(100% - 30px)); margin: 0 auto; }
 
     .hero {
@@ -134,7 +128,6 @@
     main { padding: 24px 0 54px; }
     .view { display: none; }
     .view.active { display: block; }
-
     .section-card, .card, .kpi, .item-card, .empty { background: var(--panel); border: 1px solid var(--line); clip-path: var(--notch); box-shadow: var(--shadow-soft); }
     .section-card, .card { padding: 22px; box-shadow: var(--shadow); }
     .section-title { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
@@ -172,7 +165,6 @@
     .grid-2 { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 16px; margin-bottom: 16px; }
     .grid-even { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
     .grid-series { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 16px; margin-bottom: 16px; }
-
     .filters { display: grid; gap: 13px; }
     .fields { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
     .fields.three { grid-template-columns: repeat(3, minmax(0,1fr)); }
@@ -185,13 +177,11 @@
     .rule-row { display: grid; grid-template-columns: minmax(0,1fr) 140px; gap: 12px; align-items: end; }
     .small-muted { color: var(--muted); font-size: 13px; line-height: 1.55; }
     .actions { display: flex; flex-wrap: wrap; gap: 10px; }
-
     .mini-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
     .mini-box span, .record-kpi small { display: block; color: var(--muted); font-size: 12px; font-weight: 900; margin-bottom: 5px; }
     .mini-box b { display: block; overflow-wrap: anywhere; }
     .mini-box.big b { display: block; color: var(--navy); font-size: 28px; letter-spacing: -.04em; }
     .chart-box { height: 310px; position: relative; width: 100%; min-width: 0; }
-
     .list, .record-grid { display: grid; gap: 12px; }
     .record-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); }
     .item-card { padding: 16px; }
@@ -257,15 +247,15 @@
   <header class="hero">
     <div class="shell hero-inner">
       <div class="brand-row">
-        <div class="brand-mark">CQ</div>
+        <div class="brand-mark">XLS</div>
         <div class="header-copy">
-          <p class="eyebrow">Controle técnico</p>
-          <h1>Dormentes, lotes e ensaios</h1>
-          <p id="heroRuleText">Importe o CSV para controlar produção, qualidade, séries de ensaio e relatório gerencial.</p>
+          <p class="eyebrow">Leitor técnico</p>
+          <h1>Dormentes, lotes e ensaios via Excel</h1>
+          <p id="heroRuleText">Importe a planilha .xlsx para controlar produção, qualidade, séries de ensaio e relatório gerencial.</p>
         </div>
         <div class="hero-actions">
-          <label class="btn btn-light" for="fileInputTop">Importar CSV</label>
-          <input id="fileInputTop" class="hidden" type="file" accept=".csv,text/csv" />
+          <label class="btn btn-light" for="fileInputTop">Importar XLSX</label>
+          <input id="fileInputTop" class="hidden" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" />
           <button id="pdfTopBtn" class="btn btn-accent" type="button">Report / PDF</button>
           <button id="themeToggle" class="theme-toggle" type="button" aria-label="Alternar tema" title="Alternar tema">☀</button>
         </div>
@@ -288,18 +278,18 @@
       <div class="section-card" style="margin-bottom:16px">
         <div class="section-title">
           <div>
-            <h2>Controle de qualidade para dormentes de concreto</h2>
-            <p>Site estático para GitHub Pages. Lê a planilha CSV, calcula indicadores, identifica séries próximas de ensaio e gera PDF gerencial.</p>
+            <h2>Leitor de planilha Excel para controle de dormentes</h2>
+            <p>Site estático para GitHub Pages. Lê .xlsx direto no navegador, detecta a aba correta, calcula indicadores e gera PDF gerencial.</p>
           </div>
           <button id="demoBtn" class="btn" type="button">Carregar exemplo</button>
         </div>
-        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Importar CSV">
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Importar XLSX">
           <div>
-            <strong>↥ Importar CSV da planilha</strong>
-            <span>Arraste o arquivo aqui ou clique para selecionar. A leitura acontece no navegador, sem servidor.</span>
+            <strong>↥ Importar planilha .xlsx</strong>
+            <span>Arraste o arquivo Excel aqui ou clique para selecionar. A leitura acontece no navegador, sem servidor.</span>
           </div>
         </div>
-        <input id="fileInput" class="hidden" type="file" accept=".csv,text/csv" />
+        <input id="fileInput" class="hidden" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" />
         <div id="errorBox" class="message-box"></div>
       </div>
 
@@ -353,11 +343,16 @@
         </div>
 
         <div class="card">
-          <h3>ℹ Arquivo e qualidade dos dados</h3>
+          <h3>ℹ Arquivo Excel e qualidade dos dados</h3>
           <div class="mini-grid">
-            <div class="mini-box"><span>Arquivo</span><b id="fileName">Nenhum CSV</b></div>
-            <div class="mini-box"><span>Fábrica</span><b id="factoryName">—</b></div>
+            <div class="mini-box"><span>Arquivo</span><b id="fileName">Nenhum XLSX</b></div>
+            <div class="mini-box"><span>Aba</span><b id="sheetName">—</b></div>
             <div class="mini-box"><span>Cabeçalho</span><b id="headerInfo">—</b></div>
+          </div>
+          <div class="mini-grid" style="margin-top:12px">
+            <div class="mini-box"><span>Fábrica</span><b id="factoryName">—</b></div>
+            <div class="mini-box"><span>Trocar aba</span><select id="sheetSelect" disabled><option>Nenhuma</option></select></div>
+            <div class="mini-box"><span>Status da leitura</span><b id="readStatus">Aguardando arquivo</b></div>
           </div>
           <div class="mini-grid" style="margin-top:12px">
             <div class="mini-box big"><span>Conformidade slump</span><b id="slumpCompliance">0,0%</b></div>
@@ -384,7 +379,7 @@
         <div class="section-title">
           <div>
             <h2>Séries de ensaio de liberação</h2>
-            <p>Agrupamento pelo campo “SÉRIE - ENSAIO DE LIBERAÇÃO” da planilha. O progresso usa o gatilho configurado.</p>
+            <p>Agrupamento pelo campo “SÉRIE - ENSAIO DE LIBERAÇÃO” da planilha Excel. O progresso usa o gatilho configurado.</p>
           </div>
           <button class="btn" type="button" data-go="painel">Ajustar filtros</button>
         </div>
@@ -397,7 +392,7 @@
         <div class="section-title">
           <div>
             <h2>Registros de produção</h2>
-            <p>Sem rolagem lateral: cada lote vira um cartão responsivo para caber na tela em celular, tablet e desktop.</p>
+            <p>Cada linha útil da planilha vira um cartão responsivo para caber em celular, tablet e desktop.</p>
           </div>
           <button class="btn btn-outline" type="button" data-go="painel">Filtrar</button>
         </div>
@@ -415,7 +410,7 @@
           <button id="pdfReportBtn" class="btn btn-accent" type="button">Exportar PDF</button>
         </div>
         <div class="start-grid">
-          <div class="item-card start-card"><div class="start-icon">1</div><strong>Filtre o período</strong><span>Escolha data inicial/final, projeto, status ou série no painel.</span></div>
+          <div class="item-card start-card"><div class="start-icon">1</div><strong>Importe o Excel</strong><span>Use .xlsx ou .xls, com as colunas de controle de produção.</span></div>
           <div class="item-card start-card"><div class="start-icon">2</div><strong>Revise os alertas</strong><span>Confira bloqueios, slump fora de faixa, status pendente e séries em gatilho.</span></div>
           <div class="item-card start-card highlight"><div class="start-icon">3</div><strong>Exporte o PDF</strong><span>Baixe um relatório com resumo executivo e recomendações.</span></div>
         </div>
@@ -426,17 +421,21 @@
 <script>
 (function () {
   const state = {
+    workbook: null,
+    workbookFileName: '',
     dataset: null,
     filters: { startDate: '', endDate: '', project: 'all', status: 'all', series: 'all' },
     charts: {},
   };
 
-  const demoCsv = `;CONTROLE DE FABRICAÇÃO DOS DORMENTES - FORNECEDOR - EXEMPLO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IDENTIFICAÇÃO - REFUGADOS;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;PISTA:;N° PEDIDO;LOTE;PROJETO;TIPO DE DORMENTE;TOTAL DA PRODUÇÃO;DATA DE FABRICAÇÃO:;CURA 14 DIAS;CURA 28 DIAS;COM USP;USP (LOTE);TIPO DE OMBREIRAS ;LOTE OMBREIRAS ;TEMPERATURA °C INICIAL;TEMPERATURA °C MEIO;TEMPERATURA °C FINAL;ENSAIO SLUMP TEST (mm) - ÍNICIO PISTA  - ABATIMENTO (230 +-30);ENSAIO SLUMP TEST (mm) - ÍNICIO PISTA - ESPALHAMENTO;ENSAIO SLUMP TEST (mm) - MEIO PISTA - ABATIMANTO;ENSAIO SLUMP TEST (mm) - MEIO PISTA - ESPALHAMENTO;ENSAIO SLUMP TEST (mm) - FIM PISTA - ABATIMENTO;ENSAIO SLUMP TEST (mm) - FIM PISTA - ESPALHAMENTO;DESPRONTENSÃO INICIO PISTA;DESPRONTENSÃO MEIO PISTA;DESPRONTENSÃO FIM PISTA;TEMPO DE CURA (Horas);DATAS DE RUPTURAS  7 DIAS (COMP.);DATAS DE RUPTURAS  14 DIAS (COMP.);DATAS DE RUPTURAS  14 DIAS (TRAÇÃO);DATAS DE RUPTURAS  28 DIAS (COMP.);DATAS DE RUPTURAS  28 DIAS;COMP. AXIAL (MPa) 7 DIAS;COMP. AXIAL (MPa) 14 DIAS;TRAÇÃO NA FLEXÃO 14 DIAS;COMP. AXIAL (MPa) 28 DIAS;TRAÇÃO NA FLEXÃO 28 DIAS;SÉRIE - ENSAIO DE LIBERAÇÃO;ENSAIO NO IAUDITOR;DORMENTES ENSIADOS;DORMENTES A SEREM ANALISADOS ;DORMENTES REPROVADOS;TOTAL DA PRODUÇÃO APROVADO:;STATUS ;;MOTIVO / ESPECIFICAÇÃO;
-;1;45000001;1001;MALHA PAULISTA;Bitola Larga MP;330;05/01/2026;19/01/2026;02/02/2026;SIM;_;Fast Clip;M340;_;_;_;215;470;210;400;210;390;30,00;28,12;27,50;14:18;12/01/2026;19/01/2026;19/01/2026;02/02/2026;02/02/2026;64,22 / 60,26;65,60 / 63,83;8,20 / 8,00;66,67 / 73,64;8,70 / 9,10;Série 01 - MP;OK;4;0;2;328;Liberado para transporte ;;TRINCA-121/01, VIBRAÇÃO-109/04;
-;2;45000002;1002;FERRO NORTE;Bitola Larga FN;100;06/01/2026;20/01/2026;03/02/2026;NÃO;_;Fast Clip;M340;_;_;_;190;350;210;370;205;350;34,12;30,80;30,05;13:49;13/01/2026;20/01/2026;20/01/2026;03/02/2026;03/02/2026;60,30 / 64,84;68,76 / 71,48;8,60 / 8,80;70,92 / 69,56;8,40 / 8,70;Série 01 - FN;;0;2;7;93;Bloqueado ;;FALHA DIMENSIONAL-55/02, TRINCA-82/04;
-;3;45000003;1003;FMT;Bitola Larga FMT USP;330;07/01/2026;21/01/2026;04/02/2026;SIM;_;Fast Clip;M344;_;_;_;230;480;240;420;235;410;31,22;29,50;30,10;14:02;14/01/2026;21/01/2026;21/01/2026;04/02/2026;04/02/2026;66,00 / 62,10;69,10 / 70,40;8,50 / 8,60;;;Série 02 - FMT;;0;0;0;330;;;`;
+  const demoRows = [
+    ['CONTROLE DE FABRICAÇÃO DOS DORMENTES - FORNECEDOR - EXEMPLO'],
+    [],
+    ['PISTA:', 'N° PEDIDO', 'LOTE', 'PROJETO', 'TIPO DE DORMENTE', 'TOTAL DA PRODUÇÃO', 'DATA DE FABRICAÇÃO:', 'CURA 14 DIAS', 'CURA 28 DIAS', 'ENSAIO SLUMP TEST (mm) - ÍNICIO PISTA - ABATIMENTO (230 +-30)', 'ENSAIO SLUMP TEST (mm) - MEIO PISTA - ABATIMANTO', 'ENSAIO SLUMP TEST (mm) - FIM PISTA - ABATIMENTO', 'COMP. AXIAL (MPa) 28 DIAS', 'TRAÇÃO NA FLEXÃO 28 DIAS', 'SÉRIE - ENSAIO DE LIBERAÇÃO', 'DORMENTES ENSIADOS', 'DORMENTES A SEREM ANALISADOS', 'DORMENTES REPROVADOS', 'TOTAL DA PRODUÇÃO APROVADO:', 'STATUS', 'MOTIVO / ESPECIFICAÇÃO'],
+    ['1', '45000001', '1001', 'MALHA PAULISTA', 'Bitola Larga MP', 330, '05/01/2026', '19/01/2026', '02/02/2026', 215, 210, 210, '66,67 / 73,64', '8,70 / 9,10', 'Série 01 - MP', 4, 0, 2, 328, 'Liberado para transporte', 'TRINCA-121/01, VIBRAÇÃO-109/04'],
+    ['2', '45000002', '1002', 'FERRO NORTE', 'Bitola Larga FN', 100, '06/01/2026', '20/01/2026', '03/02/2026', 190, 210, 205, '70,92 / 69,56', '8,40 / 8,70', 'Série 01 - FN', 0, 2, 7, 93, 'Bloqueado', 'FALHA DIMENSIONAL-55/02, TRINCA-82/04'],
+    ['3', '45000003', '1003', 'FMT', 'Bitola Larga FMT USP', 330, '07/01/2026', '21/01/2026', '04/02/2026', 230, 240, 235, '', '', 'Série 02 - FMT', 0, 0, 0, 330, '', ''],
+  ];
 
   const $ = (id) => document.getElementById(id);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -449,19 +448,41 @@
   }
   function titleCase(value) {
     const clean = String(value || '').replace(/\s+/g, ' ').trim();
-    if (!clean) return 'Não informado';
+    if (!clean || clean === '_') return 'Não informado';
     return clean.toLowerCase().split(' ').map(word => word.length <= 3 ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
       .replace(/\bUsp\b/g, 'USP').replace(/\bFmt\b/g, 'FMT').replace(/\bFn\b/g, 'FN').replace(/\bMp\b/g, 'MP');
   }
-  function parseDateBR(value) {
-    const match = String(value || '').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
-    if (!match) return null;
-    const day = Number(match[1]);
-    const month = Number(match[2]) - 1;
-    const year = Number(match[3].length === 2 ? `20${match[3]}` : match[3]);
-    const date = new Date(year, month, day);
-    if (Number.isNaN(date.getTime())) return null;
-    return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day ? date : null;
+  function excelSerialToDate(serial) {
+    const value = Number(serial);
+    if (!Number.isFinite(value) || value < 20000 || value > 80000) return null;
+    const utc = Math.round((value - 25569) * 86400 * 1000);
+    const d = new Date(utc);
+    return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  }
+  function parseDateAny(value) {
+    if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
+    if (typeof value === 'number') return excelSerialToDate(value);
+    const raw = String(value || '').trim();
+    if (!raw || raw === '_') return null;
+    const serial = raw.match(/^\d{5}(?:\.\d+)?$/) ? excelSerialToDate(Number(raw)) : null;
+    if (serial) return serial;
+    let match = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+    if (match) {
+      const day = Number(match[1]);
+      const month = Number(match[2]) - 1;
+      const year = Number(match[3].length === 2 ? `20${match[3]}` : match[3]);
+      const date = new Date(year, month, day);
+      return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day ? date : null;
+    }
+    match = raw.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
+    if (match) {
+      const year = Number(match[1]);
+      const month = Number(match[2]) - 1;
+      const day = Number(match[3]);
+      const date = new Date(year, month, day);
+      return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day ? date : null;
+    }
+    return null;
   }
   function inputDate(date) {
     if (!date) return '';
@@ -471,23 +492,26 @@
     return date ? date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
   }
   function parseNumber(value) {
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
     const raw = String(value ?? '').trim();
     if (!raw || raw === '_' || raw.includes('#')) return 0;
     const first = raw.match(/-?\d+(?:[.,]\d+)?/);
-    return first ? Number(first[0].replace('.', '').replace(',', '.')) || 0 : 0;
+    return first ? Number(first[0].replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.')) || 0 : 0;
   }
   function parseOptionalNumber(value) {
+    if (typeof value === 'number') return Number.isFinite(value) ? value : null;
     const raw = String(value ?? '').trim();
     if (!raw || raw === '_' || raw.includes('#')) return null;
     const first = raw.match(/-?\d+(?:[.,]\d+)?/);
     if (!first) return null;
-    const parsed = Number(first[0].replace('.', '').replace(',', '.'));
+    const parsed = Number(first[0].replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'));
     return Number.isFinite(parsed) ? parsed : null;
   }
   function parseNumberList(value) {
+    if (typeof value === 'number') return [value];
     const raw = String(value || '').trim();
     if (!raw || raw === '_' || raw.includes('#')) return [];
-    return (raw.match(/-?\d+(?:[.,]\d+)?/g) || []).map(item => Number(item.replace('.', '').replace(',', '.'))).filter(Number.isFinite);
+    return (raw.match(/-?\d+(?:[.,]\d+)?/g) || []).map(item => Number(item.replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'))).filter(Number.isFinite);
   }
   function fmtInt(value) { return Math.round(value || 0).toLocaleString('pt-BR'); }
   function fmtPct(value) { return `${(Number.isFinite(value) ? value : 0).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`; }
@@ -505,8 +529,8 @@
     }, {});
   }
   function detectFactory(rows, fileName) {
-    const firstRows = rows.slice(0, 3).flat().join(' ');
-    const match = firstRows.match(/fornecedor\s*-\s*([^;]+)/i);
+    const firstRows = rows.slice(0, 5).flat().join(' ');
+    const match = firstRows.match(/fornecedor\s*-\s*([^\n;]+)/i);
     return match && match[1] ? titleCase(match[1]) : fileName.replace(/\.[^.]+$/, '') || 'Fábrica não informada';
   }
   function buildColumnMap(headers) {
@@ -565,38 +589,49 @@
     return alerts;
   }
 
-  function parseCsvText(text, fileName = 'dados.csv') {
-    const delimiter = (text.match(/;/g) || []).length >= (text.match(/,/g) || []).length ? ';' : ',';
-    const parsed = Papa.parse(text, { delimiter, skipEmptyLines: false });
-    const rows = (parsed.data || []).filter(row => Array.isArray(row)).map(row => row.map(cell => String(cell ?? '').trim()));
-    const headerRowIndex = rows.findIndex(row => {
-      const joined = normalizeText(row.join(' '));
+  function rowsFromSheet(workbook, sheetName) {
+    const sheet = workbook.Sheets[sheetName];
+    return XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', blankrows: false, raw: false });
+  }
+  function findHeaderRowIndex(rows) {
+    return rows.findIndex(row => {
+      const joined = normalizeText(Array.isArray(row) ? row.join(' ') : '');
       return joined.includes('data de fabricacao') && joined.includes('total da producao');
     });
-    if (headerRowIndex < 0) throw new Error('Não encontrei o cabeçalho principal. O CSV precisa conter DATA DE FABRICAÇÃO e TOTAL DA PRODUÇÃO.');
+  }
+  function findBestSheetName(workbook) {
+    return workbook.SheetNames.find(name => findHeaderRowIndex(rowsFromSheet(workbook, name)) >= 0) || workbook.SheetNames[0];
+  }
+  function parseRows(rows, fileName = 'dados.xlsx', sheetName = 'Planilha') {
+    const cleanRows = (rows || []).filter(row => Array.isArray(row)).map(row => row.map(cell => String(cell ?? '').trim()));
+    const headerRowIndex = findHeaderRowIndex(cleanRows);
+    if (headerRowIndex < 0) throw new Error('Não encontrei o cabeçalho principal. A aba precisa conter DATA DE FABRICAÇÃO e TOTAL DA PRODUÇÃO.');
 
-    const headers = rows[headerRowIndex].map((h, i) => (h || `Coluna ${i + 1}`).replace(/\s+/g, ' ').trim());
+    const headers = cleanRows[headerRowIndex].map((h, i) => (h || `Coluna ${i + 1}`).replace(/\s+/g, ' ').trim());
     const map = buildColumnMap(headers);
-    const factory = detectFactory(rows, fileName);
+    const factory = detectFactory(cleanRows, fileName);
     const issues = [];
-    ['project', 'sleeperType', 'totalProduction', 'productionDate', 'releaseSeries', 'status'].forEach(key => { if (map[key] < 0) issues.push(`Coluna crítica não encontrada: ${key}`); });
+    ['project', 'sleeperType', 'totalProduction', 'productionDate', 'releaseSeries', 'status'].forEach(key => {
+      if (map[key] < 0) issues.push(`Coluna crítica não encontrada: ${key}`);
+    });
 
-    const records = rows.slice(headerRowIndex + 1).map((row, offset) => {
+    const records = cleanRows.slice(headerRowIndex + 1).map((row, offset) => {
       const approvedRaw = pick(row, map.approvedProduction);
       const approved = approvedRaw && !approvedRaw.includes('#') ? parseOptionalNumber(approvedRaw) : null;
       const base = {
-        id: `${fileName}-${headerRowIndex + offset + 2}`,
+        id: `${fileName}-${sheetName}-${headerRowIndex + offset + 2}`,
         rowNumber: headerRowIndex + offset + 2,
         factory,
+        sheetName,
         track: pick(row, map.track),
         order: pick(row, map.order),
         lot: pick(row, map.lot),
         project: titleCase(pick(row, map.project)),
         sleeperType: titleCase(pick(row, map.sleeperType)),
         totalProduction: parseNumber(pick(row, map.totalProduction)),
-        productionDate: parseDateBR(pick(row, map.productionDate)),
-        cura14: parseDateBR(pick(row, map.cura14)),
-        cura28: parseDateBR(pick(row, map.cura28)),
+        productionDate: parseDateAny(pick(row, map.productionDate)),
+        cura14: parseDateAny(pick(row, map.cura14)),
+        cura28: parseDateAny(pick(row, map.cura28)),
         slumpStartAbat: parseOptionalNumber(pick(row, map.slumpStartAbat)),
         slumpMidAbat: parseOptionalNumber(pick(row, map.slumpMidAbat)),
         slumpEndAbat: parseOptionalNumber(pick(row, map.slumpEndAbat)),
@@ -614,7 +649,65 @@
       return base;
     }).filter(record => record.project !== 'Não informado' || record.sleeperType !== 'Não informado' || record.totalProduction > 0 || record.productionDate || record.status || record.lot);
 
-    return { fileName, importedAt: new Date(), headers, headerRow: headerRowIndex + 1, factory, records, issues };
+    return { fileName, sheetName, importedAt: new Date(), headers, headerRow: headerRowIndex + 1, factory, records, issues };
+  }
+
+  function loadWorkbookFile(file) {
+    if (!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['xlsx', 'xls'].includes(ext)) {
+      showError('Envie uma planilha Excel nos formatos .xlsx ou .xls.');
+      return;
+    }
+    showError('');
+    $('readStatus').textContent = 'Lendo Excel...';
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = new Uint8Array(event.target.result);
+        const workbook = XLSX.read(data, { type: 'array', cellDates: false });
+        if (!workbook.SheetNames.length) throw new Error('A planilha não possui abas.');
+        state.workbook = workbook;
+        state.workbookFileName = file.name;
+        setupSheetSelect(workbook, findBestSheetName(workbook));
+        parseSelectedSheet();
+      } catch (err) {
+        $('readStatus').textContent = 'Falha na leitura';
+        showError(err.message || 'Não foi possível ler o arquivo Excel.');
+      }
+    };
+    reader.onerror = () => {
+      $('readStatus').textContent = 'Falha na leitura';
+      showError('Falha ao abrir o arquivo. Salve novamente como .xlsx e tente outra vez.');
+    };
+    reader.readAsArrayBuffer(file);
+  }
+  function setupSheetSelect(workbook, selectedName) {
+    const select = $('sheetSelect');
+    select.innerHTML = workbook.SheetNames.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+    select.value = selectedName;
+    select.disabled = workbook.SheetNames.length <= 1;
+  }
+  function parseSelectedSheet() {
+    if (!state.workbook) return;
+    const sheetName = $('sheetSelect').value || state.workbook.SheetNames[0];
+    try {
+      const rows = rowsFromSheet(state.workbook, sheetName);
+      applyDataset(parseRows(rows, state.workbookFileName, sheetName));
+    } catch (err) {
+      showError(err.message || 'Não foi possível interpretar essa aba.');
+      $('readStatus').textContent = 'Aba inválida';
+    }
+  }
+  function showError(message) {
+    const box = $('errorBox');
+    if (!message) {
+      box.style.display = 'none';
+      box.textContent = '';
+      return;
+    }
+    box.textContent = message;
+    box.style.display = 'block';
   }
 
   function filterRecords(records) {
@@ -691,13 +784,15 @@
     setOptions('statusFilter', unique(records, r => r.status || 'Sem status'), 'Todos');
     setOptions('seriesFilter', unique(records, r => r.releaseSeries), 'Todas');
     $('fileName').textContent = dataset.fileName;
+    $('sheetName').textContent = dataset.sheetName;
     $('factoryName').textContent = dataset.factory;
     $('headerInfo').textContent = `Linha ${dataset.headerRow} • ${dataset.headers.length} colunas`;
-    $('heroRuleText').textContent = `${dataset.factory} • ${records.length} registros importados • gatilho configurável por série.`;
+    $('readStatus').textContent = `${records.length} registro(s) importado(s)`;
+    $('heroRuleText').textContent = `${dataset.factory} • ${records.length} registros importados de ${dataset.sheetName} • gatilho configurável por série.`;
     const notice = $('issuesNotice');
     if (dataset.issues.length) {
       notice.style.display = 'block';
-      notice.innerHTML = `<b>Atenção na estrutura do CSV:</b><br>${dataset.issues.map(escapeHtml).join('<br>')}`;
+      notice.innerHTML = `<b>Atenção na estrutura da planilha:</b><br>${dataset.issues.map(escapeHtml).join('<br>')}`;
     } else {
       notice.style.display = 'none';
       notice.innerHTML = '';
@@ -750,7 +845,7 @@
       const badgeClass = item.severity === 'critical' ? 'critical' : item.severity === 'warning' ? 'warning' : 'info';
       const barClass = item.severity === 'normal' ? '' : item.severity;
       return `<div class="item-card"><div class="item-row"><div><strong>${escapeHtml(item.series)}</strong><div class="meta">${escapeHtml(item.projects)} • ${item.lots} lote(s) • último registro ${formatDate(item.lastDate)} • ${item.issues} alerta(s)</div></div><div><span class="badge ${badgeClass}">${escapeHtml(item.action)}</span><div class="series-number">${fmtInt(item.production)}<span>${fmtPct(item.progress)} do gatilho</span></div></div></div><div class="progress"><span class="${barClass}" style="width:${Math.min(item.progress, 100)}%"></span></div></div>`;
-    }).join('') : '<div class="empty"><strong>Nenhuma série encontrada</strong>Importe o CSV ou ajuste os filtros.</div>';
+    }).join('') : '<div class="empty"><strong>Nenhuma série encontrada</strong>Importe a planilha Excel ou ajuste os filtros.</div>';
 
     const maxDefect = Math.max(...defects.map(x => x.value), 1);
     $('paretoList').innerHTML = defects.length ? defects.map(item => `<div class="pareto-row"><div class="pareto-line"><b>${escapeHtml(item.name)}</b><span>${item.value}</span></div><div class="bar-bg"><div class="bar-fill" style="width:${Math.max(8, item.value / maxDefect * 100)}%"></div></div></div>`).join('') : '<div class="empty"><strong>Sem motivos preenchidos</strong>Não há motivos de refugo no filtro atual.</div>';
@@ -764,23 +859,11 @@
       const status = record.status || 'Sem status';
       const badgeClass = normalizeText(status).includes('bloqueado') ? 'critical' : record.status ? '' : 'warning';
       return `<article class="item-card"><div class="item-row"><div><strong>Lote ${escapeHtml(record.lot || '—')}</strong><div class="meta">${formatDate(record.productionDate)} • ${escapeHtml(record.project)}</div></div><span class="badge ${badgeClass}">${escapeHtml(status)}</span></div><div class="meta">${escapeHtml(record.sleeperType)} • ${escapeHtml(record.releaseSeries)}</div><div class="record-kpis"><div class="record-kpi"><small>Produção</small><b>${fmtInt(record.totalProduction)}</b></div><div class="record-kpi"><small>Reprov.</small><b>${fmtInt(record.rejectedSleepers)}</b></div><div class="record-kpi"><small>Cura 28</small><b>${formatDate(record.cura28)}</b></div></div></article>`;
-    }).join('') : '<div class="empty"><strong>Nenhum registro</strong>Importe o CSV ou ajuste os filtros.</div>';
-  }
-
-  function loadFile(file) {
-    if (!file) return;
-    $('errorBox').style.display = 'none';
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try { applyDataset(parseCsvText(String(event.target.result || ''), file.name)); }
-      catch (err) { $('errorBox').textContent = err.message || 'Não foi possível ler o CSV.'; $('errorBox').style.display = 'block'; }
-    };
-    reader.onerror = () => { $('errorBox').textContent = 'Falha ao abrir o arquivo. Exporte novamente em CSV separado por ponto e vírgula.'; $('errorBox').style.display = 'block'; };
-    reader.readAsText(file, 'ISO-8859-1');
+    }).join('') : '<div class="empty"><strong>Nenhum registro</strong>Importe a planilha Excel ou ajuste os filtros.</div>';
   }
 
   function generatePdf() {
-    if (!state.dataset) { alert('Importe um CSV antes de gerar o PDF.'); return; }
+    if (!state.dataset) { alert('Importe uma planilha Excel antes de gerar o PDF.'); return; }
     const filtered = filterRecords(state.dataset.records);
     const metrics = buildMetrics(filtered);
     const defects = buildDefects(filtered);
@@ -799,9 +882,9 @@
     }
     doc.setFillColor(0, 47, 85); doc.rect(0, 0, pageWidth, 28, 'F');
     doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
-    doc.text('Relatório Gerencial - Controle de Qualidade de Dormentes', 14, 15);
+    doc.text('Relatório Gerencial - Leitor XLSX de Dormentes', 14, 15);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
-    doc.text(`${state.dataset.factory} • ${state.filters.startDate || 'início'} a ${state.filters.endDate || 'fim'} • ${filtered.length} registros`, 14, 22);
+    doc.text(`${state.dataset.factory} • Aba: ${state.dataset.sheetName} • ${state.filters.startDate || 'início'} a ${state.filters.endDate || 'fim'} • ${filtered.length} registros`, 14, 22);
     y = 39; doc.setTextColor(0, 59, 104); addText('Resumo executivo', 14, 15, 'bold');
     const rows = [
       ['Produção total', fmtInt(metrics.totalProduction), 'Aprovados estimados', fmtInt(metrics.approved)],
@@ -836,7 +919,7 @@
       actionSeries.length > 0 ? 'Programar ensaio de liberação para as séries em gatilho/zona de atenção e revisar saldo de produção antes do próximo ciclo.' : 'Nenhuma série exige ação imediata pelo gatilho configurado.',
       metrics.rejectionRate > 2 ? 'Taxa de rejeição acima de 2%; recomenda-se Pareto por motivo e plano de ação por fábrica/projeto.' : 'Taxa de rejeição controlada pelo limite gerencial de 2% usado no painel.',
     ].forEach(item => { ensurePage(10); addText(`• ${item}`, 18, 10); });
-    doc.save(`Relatorio_CQ_Dormentes_${state.filters.startDate || 'inicio'}_${state.filters.endDate || 'fim'}.pdf`);
+    doc.save(`Relatorio_XLSX_Dormentes_${state.filters.startDate || 'inicio'}_${state.filters.endDate || 'fim'}.pdf`);
   }
 
   function setTab(id) {
@@ -847,14 +930,20 @@
 
   $$('.tab-btn').forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tab)));
   $$('[data-go]').forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.go)));
-
   $('dropzone').addEventListener('click', () => $('fileInput').click());
   $('dropzone').addEventListener('keydown', event => { if (event.key === 'Enter') $('fileInput').click(); });
   $('dropzone').addEventListener('dragover', event => { event.preventDefault(); $('dropzone').classList.add('dragover'); });
   $('dropzone').addEventListener('dragleave', () => $('dropzone').classList.remove('dragover'));
-  $('dropzone').addEventListener('drop', event => { event.preventDefault(); $('dropzone').classList.remove('dragover'); loadFile(event.dataTransfer.files && event.dataTransfer.files[0]); });
-  ['fileInput', 'fileInputTop'].forEach(id => $(id).addEventListener('change', event => loadFile(event.target.files && event.target.files[0])));
-  $('demoBtn').addEventListener('click', () => applyDataset(parseCsvText(demoCsv, 'exemplo_controle_dormentes.csv')));
+  $('dropzone').addEventListener('drop', event => { event.preventDefault(); $('dropzone').classList.remove('dragover'); loadWorkbookFile(event.dataTransfer.files && event.dataTransfer.files[0]); });
+  ['fileInput', 'fileInputTop'].forEach(id => $(id).addEventListener('change', event => loadWorkbookFile(event.target.files && event.target.files[0])));
+  $('sheetSelect').addEventListener('change', parseSelectedSheet);
+  $('demoBtn').addEventListener('click', () => {
+    state.workbook = null;
+    state.workbookFileName = '';
+    $('sheetSelect').innerHTML = '<option>Exemplo</option>';
+    $('sheetSelect').disabled = true;
+    applyDataset(parseRows(demoRows, 'exemplo_controle_dormentes.xlsx', 'Exemplo'));
+  });
   ['pdfBtn', 'pdfTopBtn', 'pdfReportBtn'].forEach(id => $(id).addEventListener('click', generatePdf));
   $('themeToggle').addEventListener('click', () => {
     document.body.classList.toggle('dark-theme');
