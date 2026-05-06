@@ -25,6 +25,7 @@ Site estático pronto para GitHub Pages, com visual inspirado na identidade da R
 - Use **Data inicial** para ignorar lotes antigos que já tiveram ensaio de liberação.
 - Use **Data final** quando quiser analisar apenas um intervalo específico.
 - O filtro **Projeto / bitola** separa automaticamente projetos de mesmo nome em combinações independentes, como `MALHA PAULISTA • BL` e `MALHA PAULISTA • BM`.
+- O filtro **Série** permite localizar uma série específica dentro do projeto/bitola selecionado ou em todos os projetos.
 - O filtro **Bitola** permite ver somente BL, BM ou itens sem bitola identificada.
 
 ## Regra usada no modo “Recalcular pela regra”

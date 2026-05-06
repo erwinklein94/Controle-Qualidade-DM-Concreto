@@ -416,8 +416,8 @@
 
     <section class="toolbar" aria-label="Filtros do painel">
       <div class="control search-control">
-        <label for="searchInput">Buscar lote, projeto, bitola ou tipo</label>
-        <input id="searchInput" placeholder="Ex.: 2794, Malha Paulista BL, Bitola Mista" />
+        <label for="searchInput">Buscar lote, projeto, série, bitola ou tipo</label>
+        <input id="searchInput" placeholder="Ex.: 2794, Série 12, Malha Paulista BL, Bitola Mista" />
       </div>
       <div class="control">
         <label for="dateFrom">Data inicial</label>
@@ -430,6 +430,10 @@
       <div class="control">
         <label for="projectFilter">Projeto / bitola</label>
         <select id="projectFilter"><option value="todos">Todos</option></select>
+      </div>
+      <div class="control">
+        <label for="serieFilter">Série</label>
+        <select id="serieFilter"><option value="todos">Todas</option></select>
       </div>
       <div class="control">
         <label for="bitolaFilter">Bitola</label>
@@ -563,6 +567,10 @@
 
     function safeKey(value) {
       return normalizeKey(value).replace(/[^A-Z0-9]+/g, "_");
+    }
+
+    function serieOptionKey(project, serieName) {
+      return `${project}|||${serieName}`;
     }
 
     function releaseKey(project, serieName, mode) {
@@ -803,16 +811,19 @@
       fillProjectFilter(projects);
 
       const selectedProject = $("projectFilter").value;
+      fillSerieFilter(projects, selectedProject);
+      const selectedSerie = $("serieFilter").value;
       const selectedStatus = $("statusFilter").value;
       const term = normalizeKey($("searchInput").value);
 
       const filteredProjects = projects.map(project => {
         let series = project.series;
+        if (selectedSerie !== "todos") series = series.filter(serie => serieOptionKey(project.project, serie.name) === selectedSerie);
         if (selectedStatus !== "todos") series = series.filter(serie => serie.status === selectedStatus);
         if (term) {
           series = series.map(serie => ({
             ...serie,
-            items: serie.items.filter(row => normalizeKey(`${row.lote} ${row.projeto} ${row.projeto_grupo} ${row.bitola_codigo} ${row.bitola_nome} ${row.tipo} ${row.serie_planilha}`).includes(term))
+            items: serie.items.filter(row => normalizeKey(`${row.lote} ${row.projeto} ${row.projeto_grupo} ${row.bitola_codigo} ${row.bitola_nome} ${row.tipo} ${row.serie_planilha} ${serie.name}`).includes(term))
           })).filter(serie => serie.items.length || normalizeKey(`${serie.name} ${serie.project}`).includes(term));
         }
         return { ...project, series };
@@ -822,7 +833,8 @@
       renderProjects(filteredProjects);
       const periodo = dateRangeLabel($("dateFrom").value, $("dateTo").value);
       const bitola = $("bitolaFilter").value === "todos" ? "todas as bitolas" : $("bitolaFilter").selectedOptions[0]?.textContent || $("bitolaFilter").value;
-      $("sourceNote").innerHTML = `Fonte: <strong>${escapeHtml(state.source)}</strong> • ${nf.format(activeRows.length)} de ${nf.format(allRows.length)} linhas válidas no recorte. Período: <strong>${escapeHtml(periodo)}</strong> • Bitola: <strong>${escapeHtml(bitola)}</strong> • Modo atual: <strong>${state.mode === "regra" ? "recalcular pela regra 2.000/10" : "usar coluna de série da planilha"}</strong>.`;
+      const serie = selectedSerie === "todos" ? "todas as séries" : $("serieFilter").selectedOptions[0]?.textContent || selectedSerie;
+      $("sourceNote").innerHTML = `Fonte: <strong>${escapeHtml(state.source)}</strong> • ${nf.format(activeRows.length)} de ${nf.format(allRows.length)} linhas válidas no recorte. Período: <strong>${escapeHtml(periodo)}</strong> • Bitola: <strong>${escapeHtml(bitola)}</strong> • Série: <strong>${escapeHtml(serie)}</strong> • Modo atual: <strong>${state.mode === "regra" ? "recalcular pela regra 2.000/10" : "usar coluna de série da planilha"}</strong>.`;
     }
 
     function fillProjectFilter(projects) {
@@ -835,6 +847,25 @@
       select.value = options.includes(current) ? current : "todos";
     }
 
+    function fillSerieFilter(projects, selectedProject = "todos") {
+      const select = $("serieFilter");
+      if (!select) return;
+      const current = select.value || "todos";
+      const visibleProjects = selectedProject === "todos" ? projects : projects.filter(project => project.project === selectedProject);
+      const optionsMap = new Map();
+      visibleProjects.forEach(project => {
+        project.series.forEach(serie => {
+          const value = serieOptionKey(project.project, serie.name);
+          optionsMap.set(value, `${project.project} • ${serie.name}`);
+        });
+      });
+      const sortedOptions = [...optionsMap.entries()].sort((a, b) => naturalCompare(a[1], b[1]));
+      const options = [["todos", "Todas"], ...sortedOptions];
+      const existing = [...select.options].map(opt => opt.value).join("|");
+      if (existing === options.map(([value]) => value).join("|")) return;
+      select.innerHTML = options.map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join("");
+      select.value = options.some(([value]) => value === current) ? current : "todos";
+    }
 
     function fillBitolaFilter(rows) {
       const select = $("bitolaFilter");
@@ -989,7 +1020,7 @@
       catch (error) { alert(`Não consegui ler a planilha: ${error.message}`); }
       finally { event.target.value = ""; }
     });
-    ["searchInput", "dateFrom", "dateTo", "projectFilter", "bitolaFilter", "statusFilter", "modeSelect"].forEach(id => $(id).addEventListener("input", render));
+    ["searchInput", "dateFrom", "dateTo", "projectFilter", "serieFilter", "bitolaFilter", "statusFilter", "modeSelect"].forEach(id => $(id).addEventListener("input", render));
     $("resetReleasesBtn").addEventListener("click", () => {
       if (!confirm("Limpar todas as marcações de séries liberadas neste navegador?")) return;
       state.releases = {};
