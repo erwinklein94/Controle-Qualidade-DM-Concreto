@@ -20,7 +20,22 @@ Site estático pronto para GitHub Pages, com visual inspirado na identidade da R
 - Se a planilha não carregar, ele usa os dados embutidos no `index.html` como fallback.
 - Também existe um botão **Atualizar com planilha** para carregar um arquivo manualmente no navegador.
 
-## Filtros importantes
+## Abas do painel
+
+### Séries de liberação
+
+Aba principal para controlar as séries de produção, ensaio e liberação para carregamento.
+
+### Dash board
+
+Aba para acompanhar a **produção semanal**.
+
+- Os filtros de **Data inicial** e **Data final** vêm pré-preenchidos com a última semana disponível na planilha carregada.
+- O filtro **Projeto / bitola** permite ver a produção semanal de um projeto específico ou de todos.
+- A tabela **Produção por projeto no período** mostra a quantidade produzida por cada combinação de projeto + bitola.
+- O gráfico **Produção semanal - toda a planilha** soma todos os projetos e mostra a evolução por semana.
+
+## Filtros importantes na aba Séries
 
 - Use **Data inicial** para ignorar lotes antigos que já tiveram ensaio de liberação.
 - Use **Data final** quando quiser analisar apenas um intervalo específico.
