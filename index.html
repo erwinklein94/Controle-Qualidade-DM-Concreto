@@ -3,1209 +3,772 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gerenciador de Relatórios iAuditor</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <title>Painel de Séries de Dormentes | Cavan</title>
+  <meta name="description" content="Controle de séries, ensaios de liberação e carregamento de dormentes de concreto da fábrica Cavan em Santa Lúcia, São Paulo." />
   <style>
     :root {
-      --bg: #f3fbff;
-      --panel: #ffffff;
-      --ink: #003b68;
-      --muted: #3a6f8f;
-      --line: #cdeeff;
-      --navy: #003b68;
-      --navy-2: #002f55;
-      --navy-3: #002844;
-      --cyan: #08a9df;
-      --cyan-2: #39c6ee;
-      --green: #00b884;
-      --green-2: #00d866;
-      --yellow: #00d866;
-      --steel: #dff6ff;
-      --red: #d93636;
-      --red-bg: #fff0f0;
-      --amber: #f59e0b;
-      --amber-bg: #fff8e8;
-      --ok: #00b884;
-      --ok-bg: #e8fff7;
-      --shadow: 0 22px 60px rgba(0, 59, 104, .13);
-      --shadow-soft: 0 12px 32px rgba(0, 59, 104, .08);
-      --notch: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px));
-      --notch-sm: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px));
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --surface-2: #f2f5f9;
+      --ink: #132033;
+      --muted: #657184;
+      --line: #dfe5ee;
+      --brand: #153e75;
+      --brand-2: #2563eb;
+      --ok: #0f766e;
+      --ok-bg: #d7f4ee;
+      --warn: #a16207;
+      --warn-bg: #fef3c7;
+      --danger: #b42318;
+      --danger-bg: #fee4e2;
+      --info: #075985;
+      --info-bg: #e0f2fe;
+      --shadow: 0 18px 45px rgba(17, 24, 39, .08);
+      --radius: 22px;
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--ink);
-      background:
-        radial-gradient(circle at 15% -5%, rgba(8,169,223,.18), transparent 34rem),
-        radial-gradient(circle at 95% 0%, rgba(0,216,102,.12), transparent 30rem),
-        linear-gradient(180deg, #f3fbff 0%, var(--bg) 58%, #e7f9ff 100%);
-      min-height: 100vh;
+      background: radial-gradient(circle at top left, #e8f1ff 0, transparent 30rem), var(--bg);
     }
-
-    body.dark-theme {
-      --bg: #001f36;
-      --panel: #062f4f;
-      --ink: #eaf9ff;
-      --muted: #a9d8ee;
-      --line: rgba(191, 240, 255, .22);
-      --navy: #002844;
-      --navy-2: #001f36;
-      --navy-3: #001728;
-      --cyan: #39c6ee;
-      --cyan-2: #67d9f5;
-      --green: #00d866;
-      --green-2: #00d866;
-      --yellow: #00d866;
-      --steel: #0b3d63;
-      --shadow: 0 22px 60px rgba(0, 0, 0, .28);
-      --shadow-soft: 0 12px 32px rgba(0, 0, 0, .20);
-      background:
-        radial-gradient(circle at 15% -5%, rgba(8,169,223,.16), transparent 34rem),
-        radial-gradient(circle at 95% 0%, rgba(0,216,102,.10), transparent 30rem),
-        linear-gradient(180deg, #001728 0%, #001f36 58%, #002844 100%);
-    }
-
-    button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; }
-    a { color: inherit; }
-
-    .shell { max-width: 1440px; margin: 0 auto; padding: 0 22px; }
-
+    button, input, select { font: inherit; }
+    .page { width: min(1480px, calc(100% - 32px)); margin: 0 auto 60px; }
     .hero {
-      position: relative;
-      overflow: hidden;
-      color: #fff;
-      background: linear-gradient(120deg, rgba(0,47,85,.98) 0%, rgba(0,59,104,.98) 54%, rgba(8,169,223,.88) 100%);
-      isolation: isolate;
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      background:
-        radial-gradient(circle at 8% 18%, rgba(255,255,255,.13), transparent 18rem),
-        radial-gradient(circle at 92% 8%, rgba(0,216,102,.16), transparent 20rem);
-      opacity: .95;
-    }
-
-    .hero-inner { padding: 6px 0; }
-
-    .brand-row {
-      display: grid;
-      grid-template-columns: auto minmax(260px, 1fr) auto;
-      align-items: center;
-      gap: 14px;
-      min-height: 64px;
-      margin: 0;
-      padding: 8px 10px 8px 14px;
-      background: linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.10));
-      border: 1px solid rgba(255,255,255,.22);
-      box-shadow: 0 12px 30px rgba(0, 28, 61, .13);
-      backdrop-filter: blur(12px);
-      clip-path: var(--notch-sm);
-    }
-
-    .brand-logo {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 128px;
-      padding: 9px 16px;
-      color: #003b68;
-      background: #fff;
-      clip-path: var(--notch-sm);
-      font-weight: 1000;
-      letter-spacing: -.08em;
-      font-size: 30px;
-      line-height: 1;
-      box-shadow: 0 7px 14px rgba(0, 28, 61, .16);
-    }
-
-    .header-copy {
-      min-width: 0;
-      padding-left: 14px;
-      border-left: 1px solid rgba(255,255,255,.22);
-      display: grid;
-      gap: 2px;
-    }
-
-    .eyebrow {
-      margin: 0;
-      font-size: 10px;
-      line-height: 1.15;
-      letter-spacing: .13em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.74);
-      font-weight: 950;
-    }
-
-    .header-copy h1 {
-      margin: 0;
-      font-size: clamp(18px, 1.55vw, 24px);
-      letter-spacing: -.04em;
-      line-height: 1.05;
-      font-weight: 950;
-    }
-
-    .header-copy p {
-      margin: 0;
-      color: rgba(255,255,255,.82);
-      font-size: 11px;
-      line-height: 1.35;
-    }
-
-    .hero-actions {
-      display: inline-flex;
-      flex-wrap: nowrap;
-      justify-content: flex-end;
-      align-items: stretch;
-      padding: 3px;
-      background: rgba(0, 47, 85, .20);
-      border: 1px solid rgba(255,255,255,.18);
-      border-radius: 13px;
-      overflow: hidden;
-    }
-
-    .hero-actions .btn,
-    .theme-toggle {
-      min-height: 34px;
-      padding: 8px 11px;
-      font-size: 12px;
-      box-shadow: none;
-      border: 0;
-      clip-path: none;
-      border-radius: 0;
-      white-space: nowrap;
-    }
-
-    .theme-toggle {
-      width: 36px;
-      height: 34px;
-      background: rgba(255,255,255,.12);
-      color: #fff;
-      display: inline-grid;
-      place-items: center;
-      font-weight: 950;
-      font-size: 14px;
-    }
-
-    .tabs {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: rgba(243,251,255,.92);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(205,238,255,.92);
-    }
-
-    body.dark-theme .tabs { background: rgba(0, 31, 54, .92); border-bottom-color: rgba(191, 240, 255, .18); }
-
-    .tabs .shell {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-top: 12px;
-      padding-bottom: 12px;
-    }
-
-    .tab-btn {
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--navy);
-      clip-path: var(--notch-sm);
-      padding: 11px 17px;
-      font-size: 14px;
-      font-weight: 900;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 8px 18px rgba(0,59,104,.05);
-      transition: .18s ease;
-    }
-
-    body.dark-theme .tab-btn { background: rgba(255,255,255,.06); color: var(--ink); border-color: var(--line); }
-    .tab-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-soft); }
-    .tab-btn.active { background: var(--navy); border-color: var(--navy); color: #fff; }
-    body.dark-theme .tab-btn.active { background: var(--cyan); color: var(--navy-3); }
-
-    main { padding: 30px 0 54px; }
-    .view { display: none; }
-    .view.active { display: block; }
-
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 16px;
-      margin-bottom: 22px;
-    }
-
-    .kpi,
-    .section-card,
-    .insight-card,
-    .history-card,
-    .table-wrap,
-    .import-box,
-    .modal {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      clip-path: var(--notch);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .kpi {
-      padding: 19px;
-      position: relative;
-      overflow: hidden;
-      min-height: 110px;
-    }
-
-    .kpi::before {
-      content: "";
-      position: absolute;
-      width: 92px;
-      height: 42px;
-      right: -18px;
-      top: 14px;
-      background: var(--yellow);
-      clip-path: var(--notch-sm);
-      opacity: .92;
-    }
-    .kpi:nth-child(2n)::before { background: var(--cyan); }
-    .kpi:nth-child(3n)::before { background: var(--green-2); }
-    .kpi.danger::before { background: var(--red); }
-    .kpi small { color: var(--muted); font-weight: 900; font-size: 12px; position: relative; z-index: 1; }
-    .kpi strong { display: block; margin-top: 8px; font-size: 30px; letter-spacing: -.04em; position: relative; z-index: 1; }
-    .kpi.danger strong { color: var(--red); }
-
-    .section-card { padding: 24px; margin-bottom: 18px; box-shadow: var(--shadow); }
-    .insight-card { padding: 20px; }
-    .history-card { padding: 18px; }
-
-    .section-title {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 18px;
-    }
-
-    .section-title h2 { margin: 0; font-size: 27px; letter-spacing: -.035em; color: var(--navy); }
-    body.dark-theme .section-title h2 { color: var(--ink); }
-    .section-title p { margin: 5px 0 0; color: var(--muted); line-height: 1.55; font-size: 14px; }
-
-    .btn {
-      border: 0;
-      clip-path: var(--notch-sm);
-      padding: 12px 16px;
-      font-weight: 950;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: .18s ease;
-      text-decoration: none;
-      box-shadow: 0 10px 24px rgba(0, 59, 104, .08);
-    }
-    .btn:hover { transform: translateY(-1px); filter: saturate(1.05); }
-    .btn-primary { background: var(--navy); color: #fff; }
-    .btn-accent { background: var(--yellow); color: var(--navy); }
-    .btn-outline { background: #fff; color: var(--navy); border: 1px solid var(--line); }
-    .btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid rgba(217,54,54,.18); }
-    .btn-small { padding: 8px 11px; font-size: 12px; }
-    body.dark-theme .btn-outline { background: rgba(255,255,255,.06); color: var(--ink); }
-    body.dark-theme .btn-primary { background: var(--cyan); color: var(--navy-3); }
-    body.dark-theme .btn-accent { background: var(--green-2); color: var(--navy-3); }
-
-    .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(350px, .7fr); gap: 18px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-
-    .import-box {
+      margin: 28px 0 20px;
       padding: 30px;
-      min-height: 250px;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      border-style: dashed;
-      transition: .18s ease;
-      background: linear-gradient(145deg, rgba(255,255,255,.92), rgba(223,246,255,.76));
+      border-radius: 30px;
+      color: white;
+      background: linear-gradient(135deg, #102a4c, #164e8f 48%, #0f766e);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
     }
-
-    body.dark-theme .import-box { background: rgba(255,255,255,.04); }
-    .import-box.dragover { transform: translateY(-2px); border-color: var(--green); box-shadow: var(--shadow); }
-    .import-box input { display: none; }
-    .import-icon { font-size: 48px; line-height: 1; margin-bottom: 14px; }
-    .import-box h3 { margin: 0 0 8px; font-size: 24px; letter-spacing: -.03em; }
-    .import-box p { margin: 0 auto 16px; color: var(--muted); line-height: 1.55; max-width: 560px; }
-
-    .mini-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
-    .mini-item {
+    .hero:after {
+      content: "";
+      position: absolute;
+      width: 440px;
+      height: 440px;
+      right: -150px;
+      top: -180px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .12);
+    }
+    .hero-inner { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: end; }
+    .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .78rem; opacity: .82; font-weight: 800; }
+    h1 { margin: 8px 0 10px; font-size: clamp(2rem, 4vw, 4.1rem); line-height: 1; letter-spacing: -0.055em; }
+    .subtitle { margin: 0; max-width: 880px; color: rgba(255,255,255,.88); font-size: 1.03rem; line-height: 1.55; }
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 14px;
+      padding: 11px 15px;
+      cursor: pointer;
+      color: white;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.25);
+      font-weight: 800;
+      transition: .18s transform, .18s background, .18s box-shadow;
+    }
+    .btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.24); }
+    .btn.primary { background: white; color: #143b6c; border-color: white; }
+    .btn.secondary { background: var(--brand); color: white; border-color: transparent; }
+    .btn.good { background: var(--ok); color: white; border-color: transparent; }
+    .btn.ghost { background: transparent; color: var(--brand); border: 1px solid var(--line); }
+    .rule-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .rule {
+      background: rgba(255,255,255,.85);
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.68);
-      clip-path: var(--notch-sm);
-      padding: 13px;
-      display: flex;
-      justify-content: space-between;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 10px 28px rgba(17,24,39,.06);
+    }
+    .rule strong { display: block; font-size: 1.5rem; letter-spacing: -.04em; color: var(--brand); }
+    .rule span { color: var(--muted); font-size: .93rem; }
+    .toolbar {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1.2fr .85fr .85fr .85fr auto;
       gap: 12px;
       align-items: center;
+      position: sticky;
+      top: 10px;
+      z-index: 20;
     }
-    body.dark-theme .mini-item { background: rgba(255,255,255,.06); }
-    .mini-item strong { display: block; font-size: 14px; }
-    .mini-item span { color: var(--muted); font-size: 12px; }
-
+    .control { display: grid; gap: 6px; }
+    .control label { font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 900; color: var(--muted); }
+    .control input, .control select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 11px 12px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+    .control input:focus, .control select:focus { border-color: #7aa7ff; box-shadow: 0 0 0 4px rgba(37, 99, 235, .12); }
+    .source-note { margin: 12px 2px 20px; color: var(--muted); font-size: .92rem; }
+    .summary-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin: 20px 0; }
+    .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 18px; box-shadow: 0 10px 26px rgba(17,24,39,.05); }
+    .kpi span { display: block; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 900; }
+    .kpi strong { display: block; margin-top: 6px; font-size: 1.8rem; letter-spacing: -.05em; }
+    #projects { display: grid; gap: 20px; }
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .project-head {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff, #f8fafc);
+    }
+    .project-title { margin: 0; font-size: clamp(1.35rem, 2vw, 2rem); letter-spacing: -.04em; }
+    .project-meta { margin: 8px 0 0; color: var(--muted); line-height: 1.5; }
+    .project-stats { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .84rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .pill.dark { background: #0f172a; color: white; border-color: #0f172a; }
+    .series-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 18px; }
+    .serie-card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: #fff;
+      padding: 16px;
+      overflow: hidden;
+      box-shadow: 0 9px 22px rgba(15,23,42,.045);
+    }
+    .serie-card.ensaio { border-color: #fecaca; background: linear-gradient(180deg, #fff, #fff8f7); }
+    .serie-card.proximo { border-color: #fde68a; background: linear-gradient(180deg, #fff, #fffdf2); }
+    .serie-card.liberada { border-color: #99f6e4; background: linear-gradient(180deg, #fff, #f3fffc); }
+    .serie-card.conferir { border-color: #bfdbfe; background: linear-gradient(180deg, #fff, #f6fbff); }
+    .serie-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: start; }
+    .serie-name { margin: 0; font-size: 1.08rem; letter-spacing: -.025em; }
+    .serie-sub { color: var(--muted); font-size: .86rem; margin-top: 3px; line-height: 1.35; }
     .badge {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 6px 9px;
-      clip-path: var(--notch-sm);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: .76rem;
       font-weight: 950;
-      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .045em;
       white-space: nowrap;
     }
-    .badge.ok { background: var(--ok-bg); color: var(--ok); }
-    .badge.warn { background: var(--amber-bg); color: var(--amber); }
-    .badge.danger { background: var(--red-bg); color: var(--red); }
-    .badge.gray { background: #eef8fd; color: var(--muted); }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-
-    input, select, textarea {
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--ink);
-      clip-path: var(--notch-sm);
-      padding: 11px 13px;
-      outline: 0;
-      min-height: 42px;
-    }
-    body.dark-theme input,
-    body.dark-theme select,
-    body.dark-theme textarea { background: rgba(255,255,255,.06); color: var(--ink); border-color: var(--line); }
-
-    .table-wrap {
-      overflow: auto;
-      clip-path: var(--notch);
-      box-shadow: var(--shadow-soft);
-    }
-    table { width: 100%; border-collapse: collapse; min-width: 960px; }
-    th, td { padding: 13px 14px; text-align: left; border-bottom: 1px solid var(--line); font-size: 13px; vertical-align: top; }
-    th { background: #f4fbff; color: var(--muted); font-weight: 950; white-space: nowrap; }
-    body.dark-theme th { background: rgba(255,255,255,.07); }
-    tr:hover td { background: rgba(8,169,223,.045); }
-
-    .progress {
-      height: 11px;
-      border-radius: 99px;
-      background: #e7f9ff;
-      overflow: hidden;
-      border: 1px solid var(--line);
-    }
-    body.dark-theme .progress { background: rgba(255,255,255,.08); }
-    .progress span { display: block; height: 100%; background: linear-gradient(90deg, var(--green), var(--cyan)); }
-
-    .chart-card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      clip-path: var(--notch);
-      padding: 18px;
-      box-shadow: var(--shadow-soft);
-    }
-    .chart-card h3 { margin: 0 0 14px; font-size: 18px; letter-spacing: -.02em; }
-    .bar-list { display: grid; gap: 12px; }
-    .bar-row { display: grid; grid-template-columns: 150px 1fr 44px; gap: 10px; align-items: center; font-size: 13px; }
-    .bar { height: 13px; background: rgba(8,169,223,.10); border: 1px solid var(--line); overflow: hidden; clip-path: var(--notch-sm); }
-    .bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--navy), var(--cyan)); }
-
-    .quality-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-    .quality-item {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.68);
-      padding: 16px;
-      clip-path: var(--notch-sm);
-    }
-    body.dark-theme .quality-item { background: rgba(255,255,255,.06); }
-    .quality-item small { color: var(--muted); font-weight: 900; }
-    .quality-item strong { display: block; margin-top: 6px; font-size: 23px; letter-spacing: -.04em; }
-
-    .empty {
-      border: 1px dashed var(--line);
-      clip-path: var(--notch);
-      padding: 30px;
-      text-align: center;
-      color: var(--muted);
-      background: rgba(255,255,255,.55);
-    }
-    body.dark-theme .empty { background: rgba(255,255,255,.04); }
-
-    .toast {
-      position: fixed;
-      right: 22px;
-      bottom: 22px;
-      z-index: 99;
-      background: var(--navy);
-      color: #fff;
-      padding: 14px 16px;
-      clip-path: var(--notch-sm);
-      box-shadow: var(--shadow);
-      max-width: 420px;
-      display: none;
-      font-weight: 800;
-      line-height: 1.4;
-    }
-    .toast.show { display: block; }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 23, 40, .44);
-      z-index: 80;
-      display: none;
-      place-items: center;
-      padding: 24px;
-    }
-    .modal-backdrop.show { display: grid; }
-    .modal { max-width: 1020px; width: 100%; max-height: 84vh; overflow: auto; padding: 24px; }
-    .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 16px; }
-    .modal-head h2 { margin: 0; }
-    .modal-summary { background: #f6fcff; border: 1px solid var(--line); clip-path: var(--notch-sm); padding: 14px; white-space: pre-wrap; line-height: 1.55; }
-    body.dark-theme .modal-summary { background: rgba(255,255,255,.06); }
-
+    .badge.ensaio { color: var(--danger); background: var(--danger-bg); }
+    .badge.proximo { color: var(--warn); background: var(--warn-bg); }
+    .badge.andamento { color: var(--info); background: var(--info-bg); }
+    .badge.liberada { color: var(--ok); background: var(--ok-bg); }
+    .badge.conferir { color: #1d4ed8; background: #dbeafe; }
+    .badge.planejado { color: #475569; background: #e2e8f0; }
+    .progress-wrap { display: grid; gap: 10px; margin: 14px 0; }
+    .progress-row { display: grid; gap: 6px; }
+    .progress-label { display: flex; justify-content: space-between; gap: 10px; font-size: .82rem; color: var(--muted); font-weight: 800; }
+    .bar { height: 10px; background: #e7edf5; border-radius: 999px; overflow: hidden; }
+    .bar > span { display: block; height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, #2563eb, #0f766e); }
+    .serie-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 12px 0 10px; }
+    .mini-btn { border: 1px solid var(--line); background: #fff; color: var(--brand); border-radius: 12px; padding: 8px 10px; cursor: pointer; font-weight: 900; font-size: .84rem; }
+    .mini-btn:hover { border-color: #a8c6ff; background: #f8fbff; }
+    .mini-btn.release { background: var(--ok); color: #fff; border-color: var(--ok); }
+    .candidate { margin: 10px 0 0; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); color: var(--ink); font-size: .88rem; line-height: 1.4; }
+    .candidate strong { color: var(--brand); }
+    details { margin-top: 12px; }
+    summary { cursor: pointer; color: var(--brand); font-weight: 950; font-size: .9rem; }
+    .lot-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: .84rem; overflow: hidden; border-radius: 14px; }
+    .lot-table th, .lot-table td { padding: 9px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .lot-table th { color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; background: #f8fafc; }
+    .lot-table tr.test-lot td { background: #fff1f2; font-weight: 900; }
+    .lot-table tr.zero-lot td { color: #8a94a6; background: #f8fafc; }
+    .lot-badge { display: inline-flex; margin-left: 6px; padding: 3px 6px; border-radius: 999px; background: var(--danger-bg); color: var(--danger); font-size: .7rem; font-weight: 950; text-transform: uppercase; }
+    .empty { padding: 34px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 24px; background: rgba(255,255,255,.7); }
+    .footer-note { margin: 24px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.6; }
+    .hide { display: none !important; }
     @media (max-width: 1100px) {
-      .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .grid-2, .grid-3, .grid-4, .quality-grid { grid-template-columns: 1fr; }
-      .brand-row { grid-template-columns: 1fr; }
-      .header-copy { border-left: 0; padding-left: 0; }
-      .hero-actions { justify-content: flex-start; }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .series-grid { grid-template-columns: 1fr; }
+      .hero-inner, .project-head { grid-template-columns: 1fr; }
+      .hero-actions, .project-stats { justify-content: flex-start; }
+      .rule-strip { grid-template-columns: 1fr; }
     }
-
-    @media (max-width: 720px) {
-      .shell { padding: 0 14px; }
-      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .section-title { align-items: flex-start; flex-direction: column; }
-      .kpi strong { font-size: 24px; }
-      .bar-row { grid-template-columns: 110px 1fr 36px; }
+    @media (max-width: 680px) {
+      .page { width: min(100% - 20px, 1480px); }
+      .hero { padding: 22px; border-radius: 22px; }
+      .toolbar { position: static; grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .series-grid { padding: 12px; }
+      .project-head { padding: 16px; }
+    }
+    @media print {
+      body { background: #fff; }
+      .toolbar, .hero-actions, .source-note, .footer-note, .serie-actions { display: none !important; }
+      .page { width: 100%; margin: 0; }
+      .hero, .project-card, .serie-card, .kpi, .rule { box-shadow: none; }
+      .series-grid { grid-template-columns: 1fr; }
+      details { break-inside: avoid; }
+      details:not([open]) .lot-table { display: none; }
     }
   </style>
 </head>
 <body>
-  <header class="hero">
-    <div class="shell hero-inner">
-      <div class="brand-row">
-        <div class="brand-logo">rumo</div>
-        <div class="header-copy">
-          <p class="eyebrow">Engenharia de Qualidade & Homologação de Materiais de Via</p>
-          <h1>Base Inteligente de Relatórios iAuditor</h1>
-          <p>Importe PDFs de inspeção, padronize os dados e acompanhe a qualidade por fornecedor, material, fiscal, lote e medida.</p>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">Fábrica Cavan • Santa Lúcia/SP</div>
+          <h1>Painel de séries de dormentes</h1>
+          <p class="subtitle">Controle visual para somar lotes por projeto, destacar o lote do ensaio de liberação e acompanhar quais séries já podem seguir para carregamento em carretas.</p>
         </div>
         <div class="hero-actions">
-          <button class="btn btn-accent" id="seedBtn">Carregar exemplo</button>
-          <button class="btn btn-primary" id="exportBtn">Exportar CSV</button>
-          <button class="theme-toggle" id="themeBtn" title="Alternar tema">◐</button>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <nav class="tabs">
-    <div class="shell">
-      <button class="tab-btn active" data-view="dashboard">▦ Painel</button>
-      <button class="tab-btn" data-view="importar">⬆ Importar PDFs</button>
-      <button class="tab-btn" data-view="base">▤ Base de Dados</button>
-      <button class="tab-btn" data-view="gerencia">◈ Gerência de Dados</button>
-      <button class="tab-btn" data-view="config">⚙ Configurações</button>
-    </div>
-  </nav>
-
-  <main class="shell">
-    <section class="view active" id="dashboard">
-      <div class="kpi-grid" id="kpiGrid"></div>
-      <div class="grid-2">
-        <div class="section-card">
-          <div class="section-title">
-            <div>
-              <h2>Visão executiva</h2>
-              <p>Resumo automático dos relatórios importados.</p>
-            </div>
-            <button class="btn btn-outline btn-small" data-go="importar">Importar novo PDF</button>
-          </div>
-          <div class="grid-3" id="executiveCards"></div>
-        </div>
-        <div class="section-card">
-          <div class="section-title">
-            <div>
-              <h2>Últimas importações</h2>
-              <p>Arquivos processados recentemente.</p>
-            </div>
-          </div>
-          <ul class="mini-list" id="recentList"></ul>
+          <button class="btn primary" id="printBtn">Imprimir / PDF</button>
+          <label class="btn" for="fileInput">Atualizar com planilha</label>
+          <input class="hide" id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
         </div>
       </div>
     </section>
 
-    <section class="view" id="importar">
-      <div class="grid-2">
-        <div class="section-card">
-          <div class="section-title">
-            <div>
-              <h2>Importar relatórios do iAuditor</h2>
-              <p>Arraste um ou mais PDFs. O sistema extrai cabeçalho, lote, fiscalização, amostragem, resultado e medidas dimensionais.</p>
-            </div>
-          </div>
-          <label class="import-box" id="dropZone">
-            <input type="file" id="pdfInput" accept="application/pdf" multiple />
-            <div>
-              <div class="import-icon">📄</div>
-              <h3>Solte os PDFs aqui</h3>
-              <p>Também funciona clicando nesta área. Os dados ficam salvos no navegador via LocalStorage nesta versão demonstrativa.</p>
-              <span class="btn btn-primary">Selecionar arquivos PDF</span>
-            </div>
-          </label>
-        </div>
-        <div class="section-card">
-          <div class="section-title">
-            <div>
-              <h2>Fila de processamento</h2>
-              <p>Status da leitura e padronização.</p>
-            </div>
-          </div>
-          <ul class="mini-list" id="queueList"></ul>
-        </div>
-      </div>
+    <section class="rule-strip" aria-label="Regra de ensaio">
+      <div class="rule"><strong>2.000</strong><span>Dormentes produzidos acumulados disparam ensaio.</span></div>
+      <div class="rule"><strong>10 lotes</strong><span>Também disparam ensaio, mesmo abaixo de 2.000 peças.</span></div>
+      <div class="rule"><strong>Último lote</strong><span>O lote que fecha a meta é separado como lote do ensaio.</span></div>
     </section>
 
-    <section class="view" id="base">
-      <div class="section-card">
-        <div class="section-title">
-          <div>
-            <h2>Base de dados padrão</h2>
-            <p>Registros extraídos e normalizados dos PDFs importados.</p>
-          </div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn btn-outline btn-small" id="downloadJsonBtn">Baixar JSON</button>
-            <button class="btn btn-danger btn-small" id="clearBtn">Limpar base</button>
-          </div>
-        </div>
-        <div class="toolbar">
-          <div class="filters">
-            <input id="searchInput" placeholder="Buscar material, lote, fornecedor..." />
-            <select id="supplierFilter"><option value="">Fornecedor: todos</option></select>
-            <select id="statusFilter"><option value="">Status: todos</option><option value="conforme">Conforme</option><option value="atenção">Atenção</option><option value="não conforme">Não conforme</option></select>
-          </div>
-          <span class="badge gray" id="rowCount">0 registros</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Material</th>
-                <th>Fornecedor</th>
-                <th>Lote</th>
-                <th>Local</th>
-                <th>Fiscal</th>
-                <th>Amostra</th>
-                <th>Reprov.</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="reportTable"></tbody>
-          </table>
-        </div>
+    <section class="toolbar" aria-label="Filtros do painel">
+      <div class="control">
+        <label for="searchInput">Buscar lote, projeto ou tipo</label>
+        <input id="searchInput" placeholder="Ex.: 2794, Ferro Norte, Bitola Larga" />
       </div>
+      <div class="control">
+        <label for="projectFilter">Projeto</label>
+        <select id="projectFilter"><option value="todos">Todos</option></select>
+      </div>
+      <div class="control">
+        <label for="statusFilter">Status</label>
+        <select id="statusFilter">
+          <option value="todos">Todos</option>
+          <option value="ensaio">Ensaio obrigatório</option>
+          <option value="proximo">Próximo do ensaio</option>
+          <option value="andamento">Em andamento</option>
+          <option value="liberada">Liberada</option>
+          <option value="conferir">Conferir</option>
+          <option value="planejado">Planejado / sem produção</option>
+        </select>
+      </div>
+      <div class="control">
+        <label for="modeSelect">Montagem das séries</label>
+        <select id="modeSelect">
+          <option value="regra">Recalcular pela regra</option>
+          <option value="planilha">Usar série da planilha</option>
+        </select>
+      </div>
+      <button class="btn secondary" id="resetReleasesBtn" title="Limpa apenas as marcações feitas no navegador">Limpar liberações</button>
     </section>
 
-    <section class="view" id="gerencia">
-      <div class="section-card">
-        <div class="section-title">
-          <div>
-            <h2>Gerência de dados</h2>
-            <p>Análise consolidada da coletânea de inspeções importadas.</p>
-          </div>
-        </div>
-        <div class="grid-4" id="managementCards"></div>
-      </div>
-      <div class="grid-2">
-        <div class="chart-card">
-          <h3>Relatórios por material</h3>
-          <div class="bar-list" id="materialChart"></div>
-        </div>
-        <div class="chart-card">
-          <h3>Volume inspecionado por fornecedor</h3>
-          <div class="bar-list" id="supplierChart"></div>
-        </div>
-      </div>
-      <div class="section-card" style="margin-top:18px;">
-        <div class="section-title">
-          <div>
-            <h2>Alertas e pontos de atenção</h2>
-            <p>Indicadores gerados automaticamente com base em reprovações, medidas fora da tolerância e lotes repetidos.</p>
-          </div>
-        </div>
-        <div class="quality-grid" id="alertsGrid"></div>
-      </div>
-    </section>
-
-    <section class="view" id="config">
-      <div class="section-card">
-        <div class="section-title">
-          <div>
-            <h2>Configurações de extração</h2>
-            <p>Campos que compõem a base padronizada. Em uma versão com backend, estes campos iriam para PostgreSQL, Supabase ou SQL Server.</p>
-          </div>
-        </div>
-        <div class="grid-3">
-          <div class="quality-item"><small>Entidade</small><strong>Relatório</strong><p>Arquivo, título, data, local, fiscal, fornecedor, status e observações.</p></div>
-          <div class="quality-item"><small>Entidade</small><strong>Lote</strong><p>Material, lote, tamanho do lote, amostragem, NBR, letra código e NQA.</p></div>
-          <div class="quality-item"><small>Entidade</small><strong>Medidas</strong><p>Medida, amostra, valor, unidade, tolerância mínima, tolerância máxima e conformidade.</p></div>
-        </div>
-      </div>
-    </section>
+    <div class="source-note" id="sourceNote">Carregando dados...</div>
+    <section class="summary-grid" id="summaryGrid"></section>
+    <section id="projects"></section>
+    <p class="footer-note">Observação: as marcações de “liberada” ficam salvas apenas neste navegador usando armazenamento local. Para um controle oficial multiusuário, o ideal é manter a planilha como base mestre e publicar uma versão atualizada no GitHub Pages.</p>
   </main>
 
-  <div class="modal-backdrop" id="modalBackdrop">
-    <div class="modal">
-      <div class="modal-head">
-        <div>
-          <p class="eyebrow" style="color:var(--muted);">Detalhe do relatório</p>
-          <h2 id="modalTitle">Relatório</h2>
-        </div>
-        <button class="btn btn-outline btn-small" id="closeModal">Fechar</button>
-      </div>
-      <div id="modalContent"></div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script>
-    if (window.pdfjsLib) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-    }
+    const LIMIT_QTY = 2000;
+    const LIMIT_LOTS = 10;
+    const NEAR_QTY = 1800;
+    const NEAR_LOTS = 9;
+    const PLANILHA_URL = "Painel%20de%20series%20de%20DM.xlsx";
+    const EMBEDDED_LOTES = [{"data":"2026-01-05","lote":2344,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 01 - FMT","linha_planilha":2},{"data":"2026-01-05","lote":2345,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":330,"serie_planilha":"Série 01 - MP","linha_planilha":3},{"data":"2026-01-06","lote":2347,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":318,"serie_planilha":"Série 01 - MP","linha_planilha":4},{"data":"2026-01-06","lote":2348,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":330,"serie_planilha":"Série 01 - MP","linha_planilha":5},{"data":"2026-01-07","lote":2349,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 01 - FMT","linha_planilha":6},{"data":"2026-01-05","lote":2473,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":100,"serie_planilha":"Série 01 - FN","linha_planilha":7},{"data":"2026-01-06","lote":2474,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":95,"serie_planilha":"Série 01 - FN","linha_planilha":8},{"data":"2026-01-07","lote":2475,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":100,"serie_planilha":"Série 01 - FN","linha_planilha":9},{"data":"2026-01-15","lote":2480,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":100,"serie_planilha":"Série 01 - FN","linha_planilha":10},{"data":"2026-01-16","lote":2481,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":100,"serie_planilha":"Série 03 - FN","linha_planilha":11},{"data":"2026-01-17","lote":2482,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":100,"serie_planilha":"Série 02 - FN","linha_planilha":12},{"data":"2026-01-19","lote":2483,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":100,"serie_planilha":"Série 02 - FN","linha_planilha":13},{"data":"2026-01-20","lote":2485,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":100,"serie_planilha":"Série 02 - FN","linha_planilha":14},{"data":"2026-01-21","lote":2487,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":100,"serie_planilha":"Série 02 - FN","linha_planilha":15},{"data":"2026-01-26","lote":2417,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":165,"serie_planilha":"Série 03 - FN","linha_planilha":16},{"data":"2026-01-27","lote":2418,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":195,"serie_planilha":"Série 03 - FN","linha_planilha":17},{"data":"2026-01-28","lote":2419,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":235,"serie_planilha":"Série 03 - FN","linha_planilha":18},{"data":"2026-01-29","lote":2420,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":255,"serie_planilha":"Série 03 - FN","linha_planilha":19},{"data":"2026-01-07","lote":2501,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":330,"serie_planilha":"Série 01 - MP","linha_planilha":20},{"data":"2026-01-07","lote":2502,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":318,"serie_planilha":"Série 01 - MP","linha_planilha":21},{"data":"2026-01-08","lote":2503,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":330,"serie_planilha":"Série 01 - MP","linha_planilha":22},{"data":"2026-01-08","lote":2504,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 01 - FMT","linha_planilha":23},{"data":"2026-01-08","lote":2505,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":318,"serie_planilha":"Série 01 - FMT","linha_planilha":24},{"data":"2026-01-31","lote":2506,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":270,"serie_planilha":"Série 03 - FN","linha_planilha":25},{"data":"2026-02-02","lote":2507,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 03 - FN","linha_planilha":26},{"data":"2026-02-03","lote":2508,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 03 - FN","linha_planilha":27},{"data":"2026-01-09","lote":2509,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":11,"serie_planilha":"Série 02 - MP","linha_planilha":28},{"data":"2026-01-09","lote":2509,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":319,"serie_planilha":"Série 02 - MP","linha_planilha":29},{"data":"2026-01-09","lote":2510,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 01 - FMT","linha_planilha":30},{"data":"2026-01-09","lote":2511,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":318,"serie_planilha":"Série 01 - FMT","linha_planilha":31},{"data":"2026-01-12","lote":2512,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":330,"serie_planilha":"Série 02 - MP","linha_planilha":32},{"data":"2026-01-12","lote":2513,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 02 - FMT","linha_planilha":33},{"data":"2026-01-12","lote":2514,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":318,"serie_planilha":"Série 02 - FMT","linha_planilha":34},{"data":"2026-01-13","lote":2515,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":330,"serie_planilha":"Série 02 - MP","linha_planilha":35},{"data":"2026-01-13","lote":2516,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 02 - FMT","linha_planilha":36},{"data":"2026-01-13","lote":2517,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":312,"serie_planilha":"Série 02 - FMT","linha_planilha":37},{"data":"2026-01-14","lote":2518,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 02 - FMT","linha_planilha":38},{"data":"2026-01-14","lote":2519,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":330,"serie_planilha":"Série 02 - MP","linha_planilha":39},{"data":"2026-01-14","lote":2520,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":312,"serie_planilha":"Série 02 - FMT","linha_planilha":40},{"data":"2026-01-15","lote":2521,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 03 - FMT","linha_planilha":41},{"data":"2026-01-16","lote":2522,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":330,"serie_planilha":"Série 02 - MP","linha_planilha":42},{"data":"2026-01-15","lote":2523,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":312,"serie_planilha":"Série 03 - FMT","linha_planilha":43},{"data":"2026-01-16","lote":2524,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 03 - FMT","linha_planilha":44},{"data":"2026-01-16","lote":2525,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":312,"serie_planilha":"Série 03 - FMT","linha_planilha":45},{"data":"2026-01-17","lote":2526,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 03 - FMT","linha_planilha":46},{"data":"2026-01-19","lote":2527,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 04 - FMT","linha_planilha":47},{"data":"2026-01-19","lote":2528,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 03 - FMT","linha_planilha":48},{"data":"2026-01-19","lote":2529,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":330,"serie_planilha":"Série 02 - MP","linha_planilha":49},{"data":"2026-01-20","lote":2530,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 04 - FMT","linha_planilha":50},{"data":"2026-01-20","lote":2531,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 04 - FMT","linha_planilha":51},{"data":"2026-01-20","lote":2532,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":330,"serie_planilha":"Série 03 - MP","linha_planilha":52},{"data":"2026-01-21","lote":2533,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 04 - FMT","linha_planilha":53},{"data":"2026-01-21","lote":2534,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 04 - FMT","linha_planilha":54},{"data":"2026-01-22","lote":2535,"projeto":"MALHA PAULISTA","tipo":"Bitola Mista MP - USP","quantidade":330,"serie_planilha":"Série 03 - MP","linha_planilha":55},{"data":"2026-01-22","lote":2536,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 05 - FMT","linha_planilha":56},{"data":"2026-01-22","lote":2537,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 04 - FMT","linha_planilha":57},{"data":"2026-01-23","lote":2538,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 05 - FMT","linha_planilha":58},{"data":"2026-01-23","lote":2539,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 05 - FMT","linha_planilha":59},{"data":"2026-01-26","lote":2540,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 05 - FMT","linha_planilha":60},{"data":"2026-01-26","lote":2541,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 05 - FMT","linha_planilha":61},{"data":"2026-01-27","lote":2542,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 06 - FMT","linha_planilha":62},{"data":"2026-01-27","lote":2543,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 05 - FMT","linha_planilha":63},{"data":"2026-01-28","lote":2544,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 06 - FMT","linha_planilha":64},{"data":"2026-01-28","lote":2545,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 06 - FMT","linha_planilha":65},{"data":"2026-01-29","lote":2546,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 06 - FMT","linha_planilha":66},{"data":"2026-01-29","lote":2547,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 06 - FMT","linha_planilha":67},{"data":"2026-01-30","lote":2548,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 07 - FMT","linha_planilha":68},{"data":"2026-02-04","lote":2549,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 03 - FN","linha_planilha":69},{"data":"2026-02-05","lote":2550,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 04 -FN","linha_planilha":70},{"data":"2026-02-06","lote":2551,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 04 -FN","linha_planilha":71},{"data":"2026-02-10","lote":2552,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 04 -FN","linha_planilha":72},{"data":"2026-02-11","lote":2553,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 04 -FN","linha_planilha":73},{"data":"2026-02-12","lote":2554,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 04 -FN","linha_planilha":74},{"data":"2026-02-13","lote":2555,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 04 -FN","linha_planilha":75},{"data":"2026-02-18","lote":2556,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":130,"serie_planilha":"Série 04 -FN","linha_planilha":76},{"data":"2026-02-18","lote":2556,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":145,"serie_planilha":"Série 04 -FN","linha_planilha":77},{"data":"2026-02-19","lote":2557,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 04 -FN","linha_planilha":78},{"data":"2026-02-20","lote":2558,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":84,"serie_planilha":"Série 04 -FN","linha_planilha":79},{"data":"2026-02-20","lote":2558,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":191,"serie_planilha":"Série 05 -FN","linha_planilha":80},{"data":"2026-02-23","lote":2559,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 05 -FN","linha_planilha":81},{"data":"2026-03-09","lote":2560,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":170,"serie_planilha":"Série 05 -FN","linha_planilha":82},{"data":"2026-03-10","lote":2562,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":170,"serie_planilha":"Série 05 -FN","linha_planilha":83},{"data":"2026-01-30","lote":2607,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 06 - FMT","linha_planilha":84},{"data":"2026-01-31","lote":2608,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 07 - FMT","linha_planilha":85},{"data":"2026-02-02","lote":2609,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 07 - FMT","linha_planilha":86},{"data":"2026-02-02","lote":2610,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 07 - FMT","linha_planilha":87},{"data":"2026-02-03","lote":2611,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 03 - MP","linha_planilha":88},{"data":"2026-02-03","lote":2612,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 07 - FMT","linha_planilha":89},{"data":"2026-02-04","lote":2613,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 03 - MP","linha_planilha":90},{"data":"2026-02-04","lote":2614,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 07 - FMT","linha_planilha":91},{"data":"2026-02-05","lote":2615,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 03 - MP","linha_planilha":92},{"data":"2026-02-05","lote":2616,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 08 - FMT","linha_planilha":93},{"data":"2026-02-06","lote":2617,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 03 - MP","linha_planilha":94},{"data":"2026-02-06","lote":2618,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 08 - FMT","linha_planilha":95},{"data":"2026-02-07","lote":2619,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 04 - MP","linha_planilha":96},{"data":"2026-02-07","lote":2620,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 08 - FMT","linha_planilha":97},{"data":"2026-02-09","lote":2621,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 08 - FMT","linha_planilha":98},{"data":"2026-02-09","lote":2622,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 05 - MP","linha_planilha":99},{"data":"2026-02-10","lote":2623,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 08 - FMT","linha_planilha":100},{"data":"2026-02-10","lote":2624,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 08 - FMT","linha_planilha":101},{"data":"2026-02-11","lote":2625,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 09 - FMT","linha_planilha":102},{"data":"2026-02-11","lote":2626,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 05 - MP","linha_planilha":103},{"data":"2026-02-12","lote":2627,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 09 - FMT","linha_planilha":104},{"data":"2026-02-12","lote":2628,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 05 - MP","linha_planilha":105},{"data":"2026-02-13","lote":2629,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 10 - FMT","linha_planilha":106},{"data":"2026-02-13","lote":2630,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 05 - MP","linha_planilha":107},{"data":"2026-02-16","lote":2631,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 05 - MP","linha_planilha":108},{"data":"2026-02-16","lote":2632,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 05 - MP","linha_planilha":109},{"data":"2026-02-17","lote":2633,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 05 - MP","linha_planilha":110},{"data":"2026-02-17","lote":2634,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 11 - FMT","linha_planilha":111},{"data":"2026-02-18","lote":2635,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 06 - MP","linha_planilha":112},{"data":"2026-02-18","lote":2636,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 12 - FMT","linha_planilha":113},{"data":"2026-02-19","lote":2637,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 06 - MP","linha_planilha":114},{"data":"2026-02-19","lote":2638,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 13 - FMT","linha_planilha":115},{"data":"2026-02-20","lote":2639,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 06 - MP","linha_planilha":116},{"data":"2026-02-20","lote":2640,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 06 - MP","linha_planilha":117},{"data":"2026-02-21","lote":2641,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 14 - FMT","linha_planilha":118},{"data":"2026-02-23","lote":2642,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 14 - FMT","linha_planilha":119},{"data":"2026-02-23","lote":2643,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 14 - FMT","linha_planilha":120},{"data":"2026-02-24","lote":2644,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 14 - FMT","linha_planilha":121},{"data":"2026-02-24","lote":2645,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 14 - FMT","linha_planilha":122},{"data":"2026-02-25","lote":2646,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 14 - FMT","linha_planilha":123},{"data":"2026-02-25","lote":2647,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 15 - FMT","linha_planilha":124},{"data":"2026-02-26","lote":2648,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 15 - FMT","linha_planilha":125},{"data":"2026-02-26","lote":2649,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 15 - FMT","linha_planilha":126},{"data":"2026-02-27","lote":2650,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 06 - MP","linha_planilha":127},{"data":"2026-02-27","lote":2651,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 15 - FMT","linha_planilha":128},{"data":"2026-03-02","lote":2652,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 06 - MP","linha_planilha":129},{"data":"2026-03-02","lote":2653,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 15 - FMT","linha_planilha":130},{"data":"2026-03-03","lote":2654,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 08 - MP","linha_planilha":131},{"data":"2026-03-03","lote":2655,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 15 - FMT","linha_planilha":132},{"data":"2026-03-04","lote":2656,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 12 - MP","linha_planilha":133},{"data":"2026-03-04","lote":2657,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 16 - FMT","linha_planilha":134},{"data":"2026-03-05","lote":2658,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 11 - MP","linha_planilha":135},{"data":"2026-03-05","lote":2659,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 16 - FMT","linha_planilha":136},{"data":"2026-03-06","lote":2660,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 10 - MP","linha_planilha":137},{"data":"2026-03-06","lote":2661,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 16 - FMT","linha_planilha":138},{"data":"2026-03-07","lote":2662,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 16 - FMT","linha_planilha":139},{"data":"2026-03-09","lote":2663,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 09 - MP","linha_planilha":140},{"data":"2026-03-09","lote":2664,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 16 - FMT","linha_planilha":141},{"data":"2026-03-10","lote":2665,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 07 - MP","linha_planilha":142},{"data":"2026-03-10","lote":2666,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 16 - FMT","linha_planilha":143},{"data":"2026-03-11","lote":2667,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":318,"serie_planilha":"Série 08 - MP","linha_planilha":144},{"data":"2026-03-11","lote":2668,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 17 - FMT","linha_planilha":145},{"data":"2026-03-12","lote":2669,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":318,"serie_planilha":"Série 08 - MP","linha_planilha":146},{"data":"2026-03-12","lote":2670,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 17 - FMT","linha_planilha":147},{"data":"2026-03-16","lote":2671,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":318,"serie_planilha":"Série 08 - MP","linha_planilha":148},{"data":"2026-03-13","lote":2672,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 17 - FMT","linha_planilha":149},{"data":"2026-03-14","lote":2673,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 17 - FMT","linha_planilha":150},{"data":"2026-03-16","lote":2674,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 17 - FMT","linha_planilha":151},{"data":"2026-03-17","lote":2675,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":312,"serie_planilha":"Série 08 - MP","linha_planilha":152},{"data":"2026-03-17","lote":2675,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP C.T curvo","quantidade":11,"serie_planilha":"Série 08 - MP","linha_planilha":153},{"data":"2026-03-17","lote":2675,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP C.T reto","quantidade":7,"serie_planilha":"Série 08 - MP","linha_planilha":154},{"data":"2026-03-17","lote":2676,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 17 - FMT","linha_planilha":155},{"data":"2026-03-18","lote":2678,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":324,"serie_planilha":"Série 22 - FMT","linha_planilha":156},{"data":"2026-03-11","lote":2862,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":170,"serie_planilha":"Série 05 -FN","linha_planilha":157},{"data":"2026-03-12","lote":2892,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":170,"serie_planilha":"Série 05 -FN","linha_planilha":158},{"data":"2026-03-13","lote":2893,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":170,"serie_planilha":"Série 06 - FN","linha_planilha":159},{"data":"2026-03-16","lote":2894,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":250,"serie_planilha":"Série 06 - FN","linha_planilha":160},{"data":"2026-03-17","lote":2895,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":260,"serie_planilha":"Série 06 - FN","linha_planilha":161},{"data":"2026-03-18","lote":2866,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 06 - FN","linha_planilha":162},{"data":"2026-03-18","lote":2677,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":300,"serie_planilha":"Série 08 - MP","linha_planilha":163},{"data":"2026-03-18","lote":2677,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP C.T curvo","quantidade":11,"serie_planilha":"Série 08 - MP","linha_planilha":164},{"data":"2026-03-18","lote":2677,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP C.T reto","quantidade":19,"serie_planilha":"Série 08 - MP","linha_planilha":165},{"data":"2026-03-19","lote":2680,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 23 - FMT","linha_planilha":166},{"data":"2026-03-19","lote":2868,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 07 - FN","linha_planilha":167},{"data":"2026-03-20","lote":2681,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 21 - FMT","linha_planilha":168},{"data":"2026-03-20","lote":2679,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":300,"serie_planilha":"Série 08 - MP","linha_planilha":169},{"data":"2026-03-20","lote":2679,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP C.T reto TR-68","quantidade":11,"serie_planilha":"Série 08 - MP","linha_planilha":170},{"data":"2026-03-20","lote":2679,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP C.T reto TR-68","quantidade":19,"serie_planilha":"Série 08 - MP","linha_planilha":171},{"data":"2026-03-20","lote":2870,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":114,"serie_planilha":"Série 07 - FN","linha_planilha":172},{"data":"2026-03-20","lote":2870,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":161,"serie_planilha":"Série 07 - FN","linha_planilha":173},{"data":"2026-03-21","lote":2736,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 20 - FMT","linha_planilha":174},{"data":"2026-03-23","lote":2737,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":300,"serie_planilha":"Série 09 - MP","linha_planilha":175},{"data":"2026-03-23","lote":2737,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":11,"serie_planilha":"Série 09 - MP","linha_planilha":176},{"data":"2026-03-23","lote":2737,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":19,"serie_planilha":"Série 09 - MP","linha_planilha":177},{"data":"2026-03-23","lote":2738,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 19 - FMT","linha_planilha":178},{"data":"2026-03-24","lote":2739,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":312,"serie_planilha":"Série 09 - MP","linha_planilha":179},{"data":"2026-03-24","lote":2739,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP C.T reto TR-68","quantidade":18,"serie_planilha":"Série 09 - MP","linha_planilha":180},{"data":"2026-03-24","lote":2740,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 18 - FMT","linha_planilha":181},{"data":"2026-03-23","lote":2873,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":270,"serie_planilha":"Série 07 - FN","linha_planilha":182},{"data":"2026-03-24","lote":2875,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":270,"serie_planilha":"Série 07 - FN","linha_planilha":183},{"data":"2026-03-25","lote":2741,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":312,"serie_planilha":"Série 09 - MP","linha_planilha":184},{"data":"2026-03-25","lote":2741,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP C.T reto TR-68","quantidade":8,"serie_planilha":"Série 09 - MP","linha_planilha":185},{"data":"2026-03-25","lote":2741,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP C.T reto UIC-60","quantidade":10,"serie_planilha":"Série 09 - MP","linha_planilha":186},{"data":"2026-03-25","lote":2742,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 24 - FMT","linha_planilha":187},{"data":"2026-03-25","lote":2874,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":270,"serie_planilha":"Série 07 - FN","linha_planilha":188},{"data":"2026-03-26","lote":2746,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":318,"serie_planilha":"Série 09 - MP","linha_planilha":189},{"data":"2026-03-26","lote":2746,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP C.T reto UIC-60","quantidade":12,"serie_planilha":"Série 09 - MP","linha_planilha":190},{"data":"2026-03-26","lote":2744,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 24 - FMT","linha_planilha":191},{"data":"2026-03-26","lote":2876,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 08 - FN","linha_planilha":192},{"data":"2026-03-27","lote":2749,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":324,"serie_planilha":"Série 09 - MP","linha_planilha":193},{"data":"2026-03-27","lote":2747,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 24 - FMT","linha_planilha":194},{"data":"2026-03-27","lote":2877,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 09 - FN","linha_planilha":195},{"data":"2026-03-28","lote":2750,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 24 - FMT","linha_planilha":196},{"data":"2026-03-30","lote":2752,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 10 - MP","linha_planilha":197},{"data":"2026-03-30","lote":2754,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 24 - FMT","linha_planilha":198},{"data":"2026-03-30","lote":2878,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Lote travado - FN","linha_planilha":199},{"data":"2026-03-31","lote":2757,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 10 - MP","linha_planilha":200},{"data":"2026-03-31","lote":2755,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 24 - FMT","linha_planilha":201},{"data":"2026-03-31","lote":2879,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 10 - FN","linha_planilha":202},{"data":"2026-04-01","lote":2760,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 10 - MP","linha_planilha":203},{"data":"2026-04-01","lote":2758,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":318,"serie_planilha":"Série 25 - FMT","linha_planilha":204},{"data":"2026-04-01","lote":2880,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 10 - FN","linha_planilha":205},{"data":"2026-04-02","lote":2763,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 10 - MP","linha_planilha":206},{"data":"2026-04-02","lote":2761,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":318,"serie_planilha":"Série 25 - FMT","linha_planilha":207},{"data":"2026-04-02","lote":2881,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 10 - FN","linha_planilha":208},{"data":"2026-04-06","lote":2767,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 10 - MP","linha_planilha":209},{"data":"2026-04-06","lote":2765,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":318,"serie_planilha":"Série 25 - FMT","linha_planilha":210},{"data":"2026-04-06","lote":2882,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 10 - FN","linha_planilha":211},{"data":"2026-04-07","lote":2770,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 10 - MP","linha_planilha":212},{"data":"2026-04-07","lote":2768,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":318,"serie_planilha":"Série 25 - FMT","linha_planilha":213},{"data":"2026-04-07","lote":2883,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 10 - FN","linha_planilha":214},{"data":"2026-04-08","lote":2771,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 25 - FMT","linha_planilha":215},{"data":"2026-04-08","lote":2884,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":270,"serie_planilha":"Série 10 - FN","linha_planilha":216},{"data":"2026-04-09","lote":2773,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 11 - MP","linha_planilha":217},{"data":"2026-04-09","lote":2774,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 25 - FMT","linha_planilha":218},{"data":"2026-04-09","lote":2885,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":270,"serie_planilha":"Série 10 - FN","linha_planilha":219},{"data":"2026-04-10","lote":2778,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 11 - MP","linha_planilha":220},{"data":"2026-04-10","lote":2886,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 26 - FMT","linha_planilha":221},{"data":"2026-04-10","lote":2776,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 11 - FN","linha_planilha":222},{"data":"2026-04-13","lote":2782,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 11 - MP","linha_planilha":223},{"data":"2026-04-13","lote":2780,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 26 - FMT","linha_planilha":224},{"data":"2026-04-13","lote":2887,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 12 - FN","linha_planilha":225},{"data":"2026-04-14","lote":2785,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 11 - MP","linha_planilha":226},{"data":"2026-04-14","lote":2783,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 26 - FMT","linha_planilha":227},{"data":"2026-04-14","lote":2888,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 12 - FN","linha_planilha":228},{"data":"2026-04-15","lote":2788,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 11 - MP","linha_planilha":229},{"data":"2026-04-15","lote":2786,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 26 - FMT","linha_planilha":230},{"data":"2026-04-15","lote":2889,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":224,"serie_planilha":"Série 12 - FN","linha_planilha":231},{"data":"2026-04-15","lote":2889,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":51,"serie_planilha":"Série 12 - FN","linha_planilha":232},{"data":"2026-04-16","lote":2791,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 11 - MP","linha_planilha":233},{"data":"2026-04-16","lote":2789,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 27 - FMT","linha_planilha":234},{"data":"2026-04-16","lote":2890,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 12 - FN","linha_planilha":235},{"data":"2026-04-17","lote":2794,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"Série 12 - MP","linha_planilha":236},{"data":"2026-04-17","lote":2792,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":330,"serie_planilha":"Série 27 - FMT","linha_planilha":237},{"data":"2026-04-17","lote":2891,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 12 - FN","linha_planilha":238},{"data":"2026-04-18","lote":2795,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":50,"serie_planilha":"Série 27 - FMT","linha_planilha":239},{"data":"2026-04-18","lote":2795,"projeto":"FMT","tipo":"Bitola Larga FMT USP","quantidade":280,"serie_planilha":"Série 27 - FMT","linha_planilha":240},{"data":"2026-04-21","lote":2799,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"0","linha_planilha":241},{"data":"2026-04-21","lote":2797,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"0","linha_planilha":242},{"data":"2026-04-21","lote":2800,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 12 - FN","linha_planilha":243},{"data":"2026-04-22","lote":2803,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"0","linha_planilha":244},{"data":"2026-04-22","lote":2802,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":330,"serie_planilha":"0","linha_planilha":245},{"data":"2026-04-22","lote":2801,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"Série 12 - FN","linha_planilha":246},{"data":"2026-04-23","lote":2805,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":0,"serie_planilha":"0","linha_planilha":247},{"data":"2026-04-24","lote":2804,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":0,"serie_planilha":"0","linha_planilha":248},{"data":"2026-04-24","lote":2808,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":0,"serie_planilha":"0","linha_planilha":249},{"data":"2026-04-27","lote":2809,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":0,"serie_planilha":"0","linha_planilha":250},{"data":"2026-04-27","lote":2811,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":0,"serie_planilha":"0","linha_planilha":251},{"data":"2026-04-28","lote":2812,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":0,"serie_planilha":"0","linha_planilha":252},{"data":"2026-04-28","lote":2814,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":0,"serie_planilha":"0","linha_planilha":253},{"data":"2026-04-23","lote":2806,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"0","linha_planilha":254},{"data":"2026-04-24","lote":2807,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"0","linha_planilha":255},{"data":"2026-04-27","lote":2810,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"0","linha_planilha":256},{"data":"2026-04-28","lote":2813,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"0","linha_planilha":257},{"data":"2026-05-01","lote":2818,"projeto":"MALHA PAULISTA","tipo":"Bitola Larga MP","quantidade":324,"serie_planilha":"0","linha_planilha":258},{"data":"2026-05-01","lote":2819,"projeto":"FERRO NORTE","tipo":"Bitola Larga FN","quantidade":275,"serie_planilha":"0","linha_planilha":259}];
 
-    const STORAGE_KEY = "iauditor_reports_db_v1";
     const state = {
-      reports: loadReports(),
-      filters: { search: "", supplier: "", status: "" }
+      rows: [],
+      source: "dados embutidos",
+      mode: "regra",
+      releases: loadReleases()
     };
 
-    const $ = (selector) => document.querySelector(selector);
-    const $$ = (selector) => [...document.querySelectorAll(selector)];
+    const $ = (id) => document.getElementById(id);
+    const nf = new Intl.NumberFormat("pt-BR");
 
-    function loadReports() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
-      catch { return []; }
+    function clean(value) {
+      return String(value ?? "").replace(/\s+/g, " ").trim();
     }
 
-    function saveReports() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.reports));
+    function normalizeKey(value) {
+      return clean(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
     }
 
-    function normalizeText(text) {
-      return (text || "")
-        .replace(/\r/g, "\n")
-        .replace(/[ \t]+/g, " ")
-        .replace(/\n{3,}/g, "\n\n")
-        .trim();
+    function parseQty(value) {
+      if (typeof value === "number" && Number.isFinite(value)) return Math.round(value);
+      const normalized = clean(value).replace(/\./g, "").replace(",", ".");
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? Math.round(parsed) : 0;
     }
 
-    function removeAccents(str) {
-      return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    }
-
-    function pick(text, patterns, fallback = "") {
-      for (const pattern of patterns) {
-        const match = text.match(pattern);
-        if (match && match[1]) return match[1].trim().replace(/\s+/g, " ");
+    function excelDateToISO(value) {
+      if (!value) return "";
+      if (value instanceof Date) return value.toISOString().slice(0, 10);
+      if (typeof value === "number") {
+        const utc = Math.round((value - 25569) * 86400 * 1000);
+        return new Date(utc).toISOString().slice(0, 10);
       }
-      return fallback;
-    }
-
-    function parseBrazilDate(raw) {
-      if (!raw) return "";
-      const months = { jan:"01", fev:"02", mar:"03", abr:"04", mai:"05", jun:"06", jul:"07", ago:"08", set:"09", out:"10", nov:"11", dez:"12" };
-      const m1 = raw.match(/(\d{1,2})\s+(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\.?\s+(\d{4})/i);
-      if (m1) return `${m1[3]}-${months[m1[2].toLowerCase().slice(0,3)]}-${String(m1[1]).padStart(2,"0")}`;
-      const m2 = raw.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-      if (m2) return `${m2[3]}-${String(m2[2]).padStart(2,"0")}-${String(m2[1]).padStart(2,"0")}`;
-      const m3 = raw.match(/(\d{4})-(\d{2})-(\d{2})/);
-      if (m3) return m3[0];
-      return raw;
-    }
-
-    function getTitle(text, fileName) {
-      const lines = text.split("\n").map(x => x.trim()).filter(Boolean);
-      const ignored = ["rumo", "interno", "tabela de medidas"];
-      const candidate = lines.find(line => line.length > 8 && !ignored.includes(removeAccents(line)) && !/^\d+\/?\d*$/.test(line));
-      return candidate || fileName.replace(/\.pdf$/i, "");
-    }
-
-    function inferSupplier(text, title) {
-      const source = removeAccents(`${title} ${text}`);
-      if (source.includes("hipper")) return "HIPPER FREIOS";
-      if (source.includes("wirklich")) return "WIRKLICH";
-      if (source.includes("pandrol")) return "PANDROL";
-      return pick(text, [/Fornecedor:\s*\n?\s*([^\n]+)/i, /Fornecedor\s+([^\n]+)/i, /supplier'?s\s+([^\n]+)/i], "Não identificado");
-    }
-
-    function extractMeasurements(text) {
-      const measurements = [];
-      const headerRegex = /((?:Medida|Olhal)[^\n]*(?:\([^\)]*\))?)(?=\s*(?:Medida|Olhal|\n\d+\s))/gi;
-      const headers = [];
-      let headerMatch;
-      const tableStart = text.search(/Tabela de medidas|Planilha de medidas/i);
-      const tableText = tableStart >= 0 ? text.slice(tableStart, tableStart + 9000) : text;
-      while ((headerMatch = headerRegex.exec(tableText)) && headers.length < 8) {
-        const raw = headerMatch[1].replace(/\s+/g, " ").trim();
-        const name = raw.replace(/\s*\([^)]*\)/g, "").trim();
-        const tol = raw.match(/\(([^)]*)\)/);
-        let min = null, max = null;
-        if (tol) {
-          const nums = tol[1].match(/\d+[\.,]?\d*/g)?.map(n => Number(n.replace(",", "."))) || [];
-          if (nums.length >= 2) { min = nums[0]; max = nums[1]; }
-          else if (nums.length === 1) { min = nums[0]; max = nums[0]; }
-        }
-        headers.push({ name, min, max, raw });
-      }
-
-      const rowRegex = /^\s*(\d{1,3})\s+(.+)$/gm;
-      let rowMatch;
-      while ((rowMatch = rowRegex.exec(tableText))) {
-        const index = Number(rowMatch[1]);
-        const values = (rowMatch[2].match(/\d+[\.,]?\d*/g) || []).map(n => Number(n.replace(",", ".")));
-        if (!values.length || index > 300) continue;
-        values.forEach((value, i) => {
-          const header = headers[i] || { name: `Medida ${String.fromCharCode(65 + i)}`, min: null, max: null, raw: "" };
-          const conforme = header.min == null || header.max == null ? null : value >= header.min && value <= header.max;
-          measurements.push({ amostra: index, medida: header.name, valor: value, unidade: "mm", minimo: header.min, maximo: header.max, conforme });
-        });
-      }
-
-      return measurements;
-    }
-
-    function parseReportFromText(text, fileName) {
-      const clean = normalizeText(text);
-      const title = getTitle(clean, fileName);
-      const material = pick(clean, [
-        /Subcomponente\s+([^\n]+)/i,
-        /Motivo:\s*Inspe[cç][aã]o\s+(?:do|de|da)?\s*([^\n]+)/i,
-        /Inspe[cç][aã]o\s+de\s+([^\n]+)\s+Revis[aã]o/i,
-        /^([^\n\/]+?)\s*\/\s*[A-Z0-9-]+\s*\/\s*Cavan/im
-      ], title);
-
-      const realizedRaw = pick(clean, [/Realizado em\s+([^\n]+)/i, /Data:\s*([^\n]+)/i], "");
-      const date = parseBrazilDate(realizedRaw);
-      const supplier = inferSupplier(clean, title);
-      const lot = pick(clean, [/Lote\s+([A-Z0-9\-\/]+)/i, /Lote:\s*\n?\s*([A-Z0-9\-\/]+)/i, /Rastreabilidade\s+([A-Z0-9\-\/]+)/i], "Sem lote");
-      const local = pick(clean, [/Local da inspe[cç][aã]o\s+([^\n]+)/i, /Local:\s*([^\n]+)/i], "Não informado");
-      const address = pick(clean, [/Localiza[cç][aã]o\s+([\s\S]*?)\(\-?\d/i], "").trim();
-      const fiscal = pick(clean, [/Fiscal\s+([^\n]+)/i, /Respons[aá]vel:\s*([^\n]+)/i], "Não informado");
-      const lotSizeRaw = pick(clean, [/Tamanho do lote\s+([\d\.]+)/i, /Tamanho do Lote:\s*\n?\s*([\d\.]+)/i, /Quantidade de unidades do lote:\s*([\d\.]+)/i], "0");
-      const sampleRaw = pick(clean, [/Amostragem\s+(\d+)/i, /Amostragem:\s*\n?\s*(\d+)/i, /Quantidade da amostra:\s*(\d+)/i], "0");
-      const codeLetter = pick(clean, [/Letra c[oó]digo.*?\s([A-Z])\b/i, /Letra-c[oó]digo:\s*([A-Z])/i, /Letra C[oó]digo:\s*\n?\s*([A-Z])/i], "");
-      const approved = Number(pick(clean, [/Quantidade aprovada[^\d]*(\d+)/i, /Resultado\s+(\d+)\s*\/\s*\d+/i], "0"));
-      const rejected = Number(pick(clean, [/Quantidade reprovada[^\d]*(\d+)/i, /Medidas fora da toler[aâ]ncia:\s*\n?\s*(\d+)/i], "0"));
-      const signaled = Number(pick(clean, [/Elementos sinalizados\s+(\d+)/i], "0"));
-      const actions = Number(pick(clean, [/A[cç][oõ]es\s+(\d+)/i], "0"));
-      const measurements = extractMeasurements(clean);
-      const outsideTolerance = measurements.filter(m => m.conforme === false).length;
-      const status = rejected > 0 || outsideTolerance > 0 ? "não conforme" : (signaled > 0 || actions > 0 ? "atenção" : "conforme");
-
-      return {
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
-        fileName,
-        importedAt: new Date().toISOString(),
-        title,
-        material,
-        supplier,
-        lot,
-        local,
-        address,
-        date,
-        fiscal,
-        lotSize: Number(String(lotSizeRaw).replace(/\./g, "")) || 0,
-        sampleSize: Number(sampleRaw) || 0,
-        codeLetter,
-        approved,
-        rejected,
-        signaled,
-        actions,
-        outsideTolerance,
-        status,
-        measurements,
-        rawText: clean.slice(0, 20000)
-      };
-    }
-
-    async function readPdfFile(file) {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-      let text = "";
-      for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
-        const page = await pdf.getPage(pageNo);
-        const content = await page.getTextContent();
-        const pageText = content.items.map(item => item.str).join(" ");
-        text += `\n\n--- Página ${pageNo} ---\n${pageText}`;
+      const text = clean(value);
+      if (/^\d{4}-\d{2}-\d{2}/.test(text)) return text.slice(0, 10);
+      const br = text.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+      if (br) {
+        const y = br[3].length === 2 ? `20${br[3]}` : br[3];
+        return `${y}-${br[2].padStart(2, "0")}-${br[1].padStart(2, "0")}`;
       }
       return text;
     }
 
-    async function handleFiles(files) {
-      if (!window.pdfjsLib) {
-        showToast("A biblioteca PDF.js não carregou. Verifique sua conexão ou instale a dependência localmente.");
-        return;
-      }
-      const pdfs = [...files].filter(file => file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf"));
-      if (!pdfs.length) return showToast("Selecione pelo menos um arquivo PDF.");
-      const queue = $("#queueList");
-      queue.innerHTML = "";
-      for (const file of pdfs) {
-        const li = document.createElement("li");
-        li.className = "mini-item";
-        li.innerHTML = `<div><strong>${escapeHtml(file.name)}</strong><span>Lendo PDF...</span></div><span class="badge warn">Processando</span>`;
-        queue.prepend(li);
-        try {
-          const text = await readPdfFile(file);
-          const report = parseReportFromText(text, file.name);
-          const duplicateIndex = state.reports.findIndex(r => r.fileName === report.fileName || (r.lot === report.lot && r.material === report.material && r.date === report.date));
-          if (duplicateIndex >= 0) state.reports[duplicateIndex] = report;
-          else state.reports.unshift(report);
-          saveReports();
-          li.innerHTML = `<div><strong>${escapeHtml(file.name)}</strong><span>${escapeHtml(report.material)} · lote ${escapeHtml(report.lot)}</span></div><span class="badge ok">Importado</span>`;
-        } catch (error) {
-          console.error(error);
-          li.innerHTML = `<div><strong>${escapeHtml(file.name)}</strong><span>${escapeHtml(error.message || "Falha na leitura")}</span></div><span class="badge danger">Erro</span>`;
-        }
-      }
-      renderAll();
-      showToast("Importação concluída. Revise a aba Base de Dados para validar os campos extraídos.");
+    function formatDate(iso) {
+      if (!iso) return "-";
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso;
+      return new Date(`${iso}T00:00:00`).toLocaleDateString("pt-BR");
     }
 
-    function formatDate(date) {
-      if (!date) return "—";
-      const d = new Date(`${date}T00:00:00`);
-      if (Number.isNaN(d.getTime())) return date;
-      return d.toLocaleDateString("pt-BR");
+    function projectCode(project) {
+      const key = normalizeKey(project);
+      if (key.includes("FERRO")) return "FN";
+      if (key.includes("MALHA")) return "MP";
+      if (key.includes("FMT")) return "FMT";
+      return key.split(" ").map(part => part[0]).join("").slice(0, 4) || "PRJ";
     }
 
-    function formatNumber(num) {
-      return Number(num || 0).toLocaleString("pt-BR");
+    function normalizeSerieName(value, project) {
+      const raw = clean(value);
+      if (!raw || raw === "0") return `Série aberta / sem série - ${projectCode(project)}`;
+      return raw
+        .replace(/\s*-\s*/g, " - ")
+        .replace(/Série\s+(\d+)/i, (_, n) => `Série ${String(Number(n)).padStart(2, "0")}`)
+        .replace(/\s+/g, " ")
+        .trim();
     }
 
-    function statusBadge(status) {
-      const cls = status === "conforme" ? "ok" : status === "atenção" ? "warn" : "danger";
-      return `<span class="badge ${cls}">${status}</span>`;
+    function safeKey(value) {
+      return normalizeKey(value).replace(/[^A-Z0-9]+/g, "_");
     }
 
-    function getFilteredReports() {
-      const search = removeAccents(state.filters.search);
-      return state.reports.filter(r => {
-        const blob = removeAccents(`${r.material} ${r.supplier} ${r.lot} ${r.local} ${r.fiscal} ${r.fileName}`);
-        return (!search || blob.includes(search)) && (!state.filters.supplier || r.supplier === state.filters.supplier) && (!state.filters.status || r.status === state.filters.status);
+    function releaseKey(project, serieName, mode) {
+      return `${mode}:${safeKey(project)}:${safeKey(serieName)}`;
+    }
+
+    function loadReleases() {
+      try { return JSON.parse(localStorage.getItem("cavan_series_liberadas_v1") || "{}"); }
+      catch { return {}; }
+    }
+
+    function saveReleases() {
+      localStorage.setItem("cavan_series_liberadas_v1", JSON.stringify(state.releases));
+    }
+
+    function mapWorkbookRows(rawRows) {
+      if (!rawRows || !rawRows.length) return [];
+      const header = rawRows[0].map(normalizeKey);
+      const findIndex = (aliases) => header.findIndex(h => aliases.some(alias => h.includes(alias)));
+      const idx = {
+        data: findIndex(["DATA DE FABRICACAO", "DATA"]),
+        lote: findIndex(["LOTE"]),
+        projeto: findIndex(["PROJETO"]),
+        tipo: findIndex(["TIPO DE DORMENTE", "TIPO"]),
+        quantidade: findIndex(["TOTAL DA PRODUCAO", "TOTAL", "QUANTIDADE"]),
+        serie: findIndex(["SERIE", "ENSAIO"])
+      };
+      return rawRows.slice(1).map((row, i) => {
+        const projeto = clean(row[idx.projeto]);
+        const lote = parseQty(row[idx.lote]);
+        if (!projeto || !lote) return null;
+        return {
+          data: excelDateToISO(row[idx.data]),
+          lote,
+          projeto,
+          tipo: clean(row[idx.tipo]),
+          quantidade: parseQty(row[idx.quantidade]),
+          serie_planilha: clean(row[idx.serie]),
+          linha_planilha: i + 2
+        };
+      }).filter(Boolean);
+    }
+
+    function rowUid(row, idx) {
+      return `${row.projeto}-${row.lote}-${row.data}-${idx}`;
+    }
+
+    function prepareRows(rows) {
+      return rows.map((row, idx) => ({
+        ...row,
+        _uid: rowUid(row, idx),
+        quantidade: parseQty(row.quantidade),
+        lote: parseQty(row.lote),
+        projeto: clean(row.projeto),
+        tipo: clean(row.tipo),
+        serie_planilha: clean(row.serie_planilha),
+        data: excelDateToISO(row.data),
+        _idx: idx
+      })).filter(row => row.projeto && row.lote);
+    }
+
+    function sortRows(rows) {
+      return [...rows].sort((a, b) => {
+        const da = a.data || "9999-99-99";
+        const db = b.data || "9999-99-99";
+        if (da !== db) return da.localeCompare(db);
+        if (a.lote !== b.lote) return a.lote - b.lote;
+        return a._idx - b._idx;
       });
     }
 
-    function summarize() {
-      const reports = state.reports;
-      const totalLots = reports.length;
-      const totalInspected = reports.reduce((acc, r) => acc + (r.sampleSize || 0), 0);
-      const totalLotSize = reports.reduce((acc, r) => acc + (r.lotSize || 0), 0);
-      const rejected = reports.reduce((acc, r) => acc + (r.rejected || 0), 0);
-      const outside = reports.reduce((acc, r) => acc + (r.outsideTolerance || 0), 0);
-      const conformes = reports.filter(r => r.status === "conforme").length;
-      const suppliers = new Set(reports.map(r => r.supplier).filter(Boolean)).size;
-      const materials = new Set(reports.map(r => r.material).filter(Boolean)).size;
-      return { totalLots, totalInspected, totalLotSize, rejected, outside, conformes, suppliers, materials };
+    function emptySerie(project, name, mode) {
+      return {
+        project,
+        name,
+        mode,
+        items: [],
+        total: 0,
+        productiveLots: 0,
+        closed: false,
+        plannedOnly: false,
+        testLotUid: null
+      };
     }
 
-    function groupBy(items, keyFn, valueFn = () => 1) {
+    function finalizeSerie(serie) {
+      serie.total = serie.items.reduce((sum, row) => sum + Math.max(0, row.quantidade || 0), 0);
+      serie.productiveLots = serie.items.filter(row => (row.quantidade || 0) > 0).length;
+      if (!serie.plannedOnly) {
+        serie.closed = serie.total >= LIMIT_QTY || serie.productiveLots >= LIMIT_LOTS;
+        if (serie.closed && !serie.testLotUid) {
+          const lastPositive = [...serie.items].reverse().find(row => (row.quantidade || 0) > 0);
+          serie.testLotUid = lastPositive?._uid || null;
+        }
+      }
+      serie.key = releaseKey(serie.project, serie.name, serie.mode);
+      serie.released = Boolean(state.releases[serie.key]);
+      const status = getSerieStatus(serie);
+      serie.status = status.value;
+      serie.statusLabel = status.label;
+      return serie;
+    }
+
+    function buildByRule(rows) {
+      const groups = groupBy(rows, row => row.projeto);
+      return Object.entries(groups).map(([project, projectRows]) => {
+        const sorted = sortRows(projectRows);
+        const series = [];
+        const planned = [];
+        let seq = 1;
+        let current = emptySerie(project, `Série ${String(seq).padStart(2, "0")} - ${projectCode(project)}`, "regra");
+
+        sorted.forEach(row => {
+          if ((row.quantidade || 0) <= 0) {
+            planned.push(row);
+            return;
+          }
+          current.items.push(row);
+          current.total += row.quantidade;
+          current.productiveLots += 1;
+          if (current.total >= LIMIT_QTY || current.productiveLots >= LIMIT_LOTS) {
+            current.testLotUid = row._uid;
+            series.push(finalizeSerie(current));
+            seq += 1;
+            current = emptySerie(project, `Série ${String(seq).padStart(2, "0")} - ${projectCode(project)}`, "regra");
+          }
+        });
+
+        if (current.items.length) series.push(finalizeSerie(current));
+        if (planned.length) {
+          const plannedSerie = emptySerie(project, `Lotes planejados / sem produção - ${projectCode(project)}`, "regra");
+          plannedSerie.items = sortRows(planned);
+          plannedSerie.plannedOnly = true;
+          series.push(finalizeSerie(plannedSerie));
+        }
+        return finalizeProject(project, series);
+      });
+    }
+
+    function buildBySpreadsheet(rows) {
+      const projectGroups = groupBy(rows, row => row.projeto);
+      return Object.entries(projectGroups).map(([project, projectRows]) => {
+        const seriesGroups = groupBy(projectRows, row => normalizeSerieName(row.serie_planilha, project));
+        const series = Object.entries(seriesGroups).map(([name, items]) => {
+          const serie = emptySerie(project, name, "planilha");
+          serie.items = sortRows(items);
+          if (name.includes("aberta / sem série") && serie.items.every(row => (row.quantidade || 0) <= 0)) serie.plannedOnly = true;
+          return finalizeSerie(serie);
+        }).sort((a, b) => naturalCompare(a.name, b.name));
+        return finalizeProject(project, series);
+      });
+    }
+
+    function finalizeProject(project, series) {
+      const total = series.reduce((sum, serie) => sum + serie.total, 0);
+      const lots = series.reduce((sum, serie) => sum + serie.productiveLots, 0);
+      const needsTest = series.filter(s => s.status === "ensaio").length;
+      const released = series.filter(s => s.status === "liberada").length;
+      const near = series.filter(s => s.status === "proximo").length;
+      return { project, series, total, lots, needsTest, released, near };
+    }
+
+    function getSerieStatus(serie) {
+      if (serie.plannedOnly) return { value: "planejado", label: "Planejado / sem produção" };
+      if (serie.released) return { value: "liberada", label: "Liberada p/ carregamento" };
+      if (serie.closed) return { value: "ensaio", label: "Ensaio obrigatório" };
+      if (serie.mode === "planilha" && !serie.name.includes("aberta / sem série") && serie.total < NEAR_QTY && serie.productiveLots < NEAR_LOTS) {
+        return { value: "conferir", label: "Conferir série" };
+      }
+      if (serie.total >= NEAR_QTY || serie.productiveLots >= NEAR_LOTS) return { value: "proximo", label: "Próximo do ensaio" };
+      return { value: "andamento", label: "Em andamento" };
+    }
+
+    function groupBy(items, getter) {
       return items.reduce((acc, item) => {
-        const key = keyFn(item) || "Não identificado";
-        acc[key] = (acc[key] || 0) + valueFn(item);
+        const key = getter(item);
+        acc[key] = acc[key] || [];
+        acc[key].push(item);
         return acc;
       }, {});
     }
 
-    function renderKpis() {
-      const s = summarize();
-      $("#kpiGrid").innerHTML = `
-        <div class="kpi"><small>Relatórios</small><strong>${formatNumber(s.totalLots)}</strong></div>
-        <div class="kpi"><small>Unidades em lotes</small><strong>${formatNumber(s.totalLotSize)}</strong></div>
-        <div class="kpi"><small>Amostras medidas</small><strong>${formatNumber(s.totalInspected)}</strong></div>
-        <div class="kpi"><small>Fornecedores</small><strong>${formatNumber(s.suppliers)}</strong></div>
-        <div class="kpi"><small>Materiais</small><strong>${formatNumber(s.materials)}</strong></div>
-        <div class="kpi danger"><small>Reprov. / Fora tol.</small><strong>${formatNumber(s.rejected + s.outside)}</strong></div>
-      `;
+    function naturalCompare(a, b) {
+      return a.localeCompare(b, "pt-BR", { numeric: true, sensitivity: "base" });
     }
 
-    function renderDashboard() {
-      const reports = state.reports;
-      const s = summarize();
-      const conformity = s.totalLots ? Math.round((s.conformes / s.totalLots) * 100) : 0;
-      const biggestLot = [...reports].sort((a, b) => (b.lotSize || 0) - (a.lotSize || 0))[0];
-      const latest = [...reports].sort((a, b) => String(b.date).localeCompare(String(a.date)))[0];
-      $("#executiveCards").innerHTML = reports.length ? `
-        <div class="quality-item"><small>Conformidade geral</small><strong>${conformity}%</strong><div class="progress"><span style="width:${conformity}%"></span></div></div>
-        <div class="quality-item"><small>Maior lote</small><strong>${biggestLot ? formatNumber(biggestLot.lotSize) : 0}</strong><p>${biggestLot ? escapeHtml(biggestLot.material) : "—"}</p></div>
-        <div class="quality-item"><small>Última inspeção</small><strong>${latest ? formatDate(latest.date) : "—"}</strong><p>${latest ? escapeHtml(latest.material) : "—"}</p></div>
-      ` : `<div class="empty" style="grid-column:1/-1;">Importe PDFs para iniciar a análise gerencial.</div>`;
-
-      $("#recentList").innerHTML = reports.slice(0, 6).map(r => `
-        <li class="mini-item">
-          <div><strong>${escapeHtml(r.material)}</strong><span>${formatDate(r.date)} · lote ${escapeHtml(r.lot)} · ${escapeHtml(r.supplier)}</span></div>
-          ${statusBadge(r.status)}
-        </li>
-      `).join("") || `<li class="empty">Nenhuma importação ainda.</li>`;
-    }
-
-    function renderFilters() {
-      const current = state.filters.supplier;
-      const suppliers = [...new Set(state.reports.map(r => r.supplier).filter(Boolean))].sort();
-      $("#supplierFilter").innerHTML = `<option value="">Fornecedor: todos</option>` + suppliers.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join("");
-      $("#supplierFilter").value = current;
-    }
-
-    function renderTable() {
-      const reports = getFilteredReports();
-      $("#rowCount").textContent = `${reports.length} registro${reports.length === 1 ? "" : "s"}`;
-      $("#reportTable").innerHTML = reports.map(r => `
-        <tr>
-          <td>${formatDate(r.date)}</td>
-          <td><strong>${escapeHtml(r.material)}</strong><br><span style="color:var(--muted);">${escapeHtml(r.fileName)}</span></td>
-          <td>${escapeHtml(r.supplier)}</td>
-          <td><strong>${escapeHtml(r.lot)}</strong><br><span style="color:var(--muted);">${formatNumber(r.lotSize)} un.</span></td>
-          <td>${escapeHtml(r.local)}</td>
-          <td>${escapeHtml(r.fiscal)}</td>
-          <td>${formatNumber(r.sampleSize)}</td>
-          <td>${formatNumber((r.rejected || 0) + (r.outsideTolerance || 0))}</td>
-          <td>${statusBadge(r.status)}</td>
-          <td><button class="btn btn-outline btn-small" onclick="openReport('${r.id}')">Ver</button></td>
-        </tr>
-      `).join("") || `<tr><td colspan="10"><div class="empty">Nenhum relatório encontrado.</div></td></tr>`;
-    }
-
-    function renderManagement() {
-      const reports = state.reports;
-      const s = summarize();
-      const conformity = s.totalLots ? Math.round((s.conformes / s.totalLots) * 100) : 0;
-      const lotsByKey = groupBy(reports, r => `${r.material} · ${r.lot}`);
-      const repeatedLots = Object.values(lotsByKey).filter(v => v > 1).length;
-      const inspectedRate = s.totalLotSize ? ((s.totalInspected / s.totalLotSize) * 100).toFixed(2) : "0.00";
-      $("#managementCards").innerHTML = `
-        <div class="quality-item"><small>Conformidade dos relatórios</small><strong>${conformity}%</strong><div class="progress"><span style="width:${conformity}%"></span></div></div>
-        <div class="quality-item"><small>Lotes repetidos</small><strong>${formatNumber(repeatedLots)}</strong><p>Mesmo material e lote em mais de um PDF.</p></div>
-        <div class="quality-item"><small>Taxa média de amostragem</small><strong>${inspectedRate}%</strong><p>Amostras sobre unidades totais dos lotes.</p></div>
-        <div class="quality-item"><small>Medidas extraídas</small><strong>${formatNumber(reports.reduce((a, r) => a + r.measurements.length, 0))}</strong><p>Valores dimensionais salvos na base.</p></div>
-      `;
-
-      renderBarChart("#materialChart", groupBy(reports, r => shortMaterial(r.material)), "rel.");
-      renderBarChart("#supplierChart", groupBy(reports, r => r.supplier, r => r.lotSize || 0), "un.");
-
-      const alerts = [];
-      const nonConforming = reports.filter(r => r.status !== "conforme");
-      if (nonConforming.length) alerts.push({ type: "danger", title: `${nonConforming.length} relatório(s) com atenção`, text: "Há reprovações, ações, elementos sinalizados ou medidas fora da tolerância." });
-      if (repeatedLots) alerts.push({ type: "warn", title: `${repeatedLots} lote(s) repetido(s)`, text: "Verifique se são reimportações, inspeções complementares ou duplicidade de arquivo." });
-      const lowSample = reports.filter(r => r.sampleSize && r.lotSize && (r.sampleSize / r.lotSize) < 0.0005);
-      if (lowSample.length) alerts.push({ type: "warn", title: `${lowSample.length} lote(s) com amostragem muito baixa`, text: "Confirme a regra de amostragem aplicada para lotes grandes." });
-      if (!alerts.length) alerts.push({ type: "ok", title: "Sem alertas críticos", text: "A base importada não indica reprovações ou medidas fora da tolerância." });
-      $("#alertsGrid").innerHTML = alerts.map(a => `
-        <div class="quality-item">
-          <span class="badge ${a.type}">${a.type === "ok" ? "OK" : a.type === "warn" ? "Atenção" : "Crítico"}</span>
-          <strong style="font-size:20px;">${escapeHtml(a.title)}</strong>
-          <p>${escapeHtml(a.text)}</p>
-        </div>
-      `).join("");
-    }
-
-    function renderBarChart(selector, data, suffix) {
-      const entries = Object.entries(data).sort((a, b) => b[1] - a[1]).slice(0, 8);
-      const max = Math.max(1, ...entries.map(([, v]) => v));
-      $(selector).innerHTML = entries.map(([label, value]) => `
-        <div class="bar-row">
-          <span title="${escapeHtml(label)}">${escapeHtml(label.slice(0, 24))}</span>
-          <div class="bar"><span style="width:${Math.max(4, (value / max) * 100)}%"></span></div>
-          <strong>${suffix === "un." ? compact(value) : value}</strong>
-        </div>
-      `).join("") || `<div class="empty">Sem dados para exibir.</div>`;
-    }
-
-    function shortMaterial(material) {
-      const text = material || "Não identificado";
-      if (removeAccents(text).includes("palmilha")) return "Palmilha";
-      if (removeAccents(text).includes("ombreira")) return "Ombreira";
-      if (removeAccents(text).includes("grampo")) return "Grampo W";
-      if (removeAccents(text).includes("isolador")) return "Isolador";
-      return text.split(" ").slice(0, 3).join(" ");
-    }
-
-    function compact(value) {
-      return Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(value || 0);
-    }
-
-    function openReport(id) {
-      const report = state.reports.find(r => r.id === id);
-      if (!report) return;
-      $("#modalTitle").textContent = `${report.material} · lote ${report.lot}`;
-      const measurements = report.measurements.slice(0, 80);
-      $("#modalContent").innerHTML = `
-        <div class="grid-3" style="margin-bottom:16px;">
-          <div class="quality-item"><small>Fornecedor</small><strong>${escapeHtml(report.supplier)}</strong></div>
-          <div class="quality-item"><small>Data</small><strong>${formatDate(report.date)}</strong></div>
-          <div class="quality-item"><small>Status</small><strong>${report.status}</strong></div>
-        </div>
-        <div class="table-wrap" style="margin-bottom:16px;">
-          <table style="min-width:760px;">
-            <thead><tr><th>Amostra</th><th>Medida</th><th>Valor</th><th>Tolerância</th><th>Resultado</th></tr></thead>
-            <tbody>
-              ${measurements.map(m => `<tr><td>${m.amostra}</td><td>${escapeHtml(m.medida)}</td><td>${m.valor} ${m.unidade}</td><td>${m.minimo ?? "—"} a ${m.maximo ?? "—"}</td><td>${m.conforme === null ? "Sem tolerância" : m.conforme ? "Conforme" : "Fora"}</td></tr>`).join("") || `<tr><td colspan="5">Nenhuma medida extraída automaticamente.</td></tr>`}
-            </tbody>
-          </table>
-        </div>
-        <details>
-          <summary class="btn btn-outline btn-small">Ver texto bruto extraído</summary>
-          <div class="modal-summary">${escapeHtml(report.rawText.slice(0, 8000))}</div>
-        </details>
-      `;
-      $("#modalBackdrop").classList.add("show");
-    }
-
-    function renderAll() {
-      renderKpis();
-      renderDashboard();
-      renderFilters();
-      renderTable();
-      renderManagement();
-    }
-
-    function goTo(viewId) {
-      $$(".tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.view === viewId));
-      $$(".view").forEach(view => view.classList.toggle("active", view.id === viewId));
-    }
-
-    function exportCsv() {
-      const headers = ["data", "material", "fornecedor", "lote", "local", "fiscal", "tamanho_lote", "amostragem", "letra_codigo", "aprovados", "reprovados", "fora_tolerancia", "status", "arquivo"];
-      const rows = state.reports.map(r => [r.date, r.material, r.supplier, r.lot, r.local, r.fiscal, r.lotSize, r.sampleSize, r.codeLetter, r.approved, r.rejected, r.outsideTolerance, r.status, r.fileName]);
-      downloadFile("base_relatorios_iauditor.csv", [headers, ...rows].map(row => row.map(csvCell).join(";")).join("\n"), "text/csv;charset=utf-8");
-    }
-
-    function csvCell(value) {
-      const s = String(value ?? "").replace(/"/g, '""');
-      return `"${s}"`;
-    }
-
-    function downloadJson() {
-      downloadFile("base_relatorios_iauditor.json", JSON.stringify(state.reports, null, 2), "application/json");
-    }
-
-    function downloadFile(name, content, type) {
-      const blob = new Blob([content], { type });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = name;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function seedExample() {
-      const examples = [
-        { title:"Ombreira E-CLIP HFOB02 HIPPER FREIOS", material:"Ombreira E-CLIP HFOB02", supplier:"HIPPER FREIOS", lot:"332", local:"Cavan - SP", date:"2026-02-26", fiscal:"Erwin Klein", lotSize:15000, sampleSize:50, codeLetter:"K", status:"conforme", fileName:"72-26 - Ombreira-E-CLIP-HFOB02.pdf", approved:50, rejected:0, signaled:0, actions:0, outsideTolerance:0 },
-        { title:"Grampo W PANDROL com isolador frontal capa branca", material:"Grampo W com isolador Capa Branca 1605P", supplier:"PANDROL", lot:"6407", local:"Cavan - SP", date:"2026-02-25", fiscal:"Erwin Klein", lotSize:11000, sampleSize:50, codeLetter:"K", status:"conforme", fileName:"70-26 - Grampo-W-com-isolador.pdf", approved:50, rejected:0, signaled:0, actions:0, outsideTolerance:0 },
-        { title:"Palmilha Verde UIC 60 PA6 WIRKLICH", material:"Palmilha Verde Almofada 4546", supplier:"WIRKLICH", lot:"2511", local:"Cavan - SP", date:"2026-02-25", fiscal:"Erwin Klein", lotSize:35550, sampleSize:80, codeLetter:"L", status:"conforme", fileName:"69-26 - Palmilha-Verde-Almofada.pdf", approved:80, rejected:0, signaled:0, actions:0, outsideTolerance:0 },
-        { title:"Ombreira FAST-CLIP HFOB08 HIPPER FREIOS", material:"Ombreira FAST-CLIP HFOB08", supplier:"HIPPER FREIOS", lot:"N028", local:"Cavan - SP", date:"2026-02-24", fiscal:"Erwin Klein", lotSize:3000, sampleSize:20, codeLetter:"H", status:"conforme", fileName:"66-26 - Ombreira-FAST-CLIP-HFOB08.pdf", approved:20, rejected:0, signaled:0, actions:0, outsideTolerance:0 },
-        { title:"Palmilha Branca TR-68 PA6 PANDROL", material:"Palmilha Branca TR68 FAST-CLIP", supplier:"PANDROL", lot:"6498", local:"Cavan - SP", date:"2026-02-19", fiscal:"Erwin Klein", lotSize:50400, sampleSize:80, codeLetter:"L", status:"conforme", fileName:"Palmilha-Branca-TR68-FAST-CLIP-6498.pdf", approved:80, rejected:0, signaled:0, actions:0, outsideTolerance:0 }
-      ].map(e => ({
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
-        importedAt: new Date().toISOString(),
-        address: "Rodovia Deputado Aldo Lupo, KM 257 - Santa Lúcia - SP",
-        measurements: mockMeasures(e.material),
-        rawText: "Registro demonstrativo gerado para simular a base antes da importação real de PDFs.",
-        ...e
-      }));
-      state.reports = [...examples, ...state.reports.filter(r => !examples.some(e => e.fileName === r.fileName))];
-      saveReports();
-      renderAll();
-      showToast("Exemplos carregados na base demonstrativa.");
-    }
-
-    function mockMeasures(material) {
-      const isPalmilha = removeAccents(material).includes("palmilha");
-      const names = isPalmilha ? ["Medida A", "Medida B", "Medida C", "Medida D"] : ["Medida A", "Medida B", "Medida C"];
-      return Array.from({ length: 20 }).flatMap((_, i) => names.map((name, j) => ({
-        amostra: i + 1,
-        medida: name,
-        valor: Number((100 + j * 15 + Math.random()).toFixed(2)),
-        unidade: "mm",
-        minimo: null,
-        maximo: null,
-        conforme: null
-      })));
-    }
-
-    function showToast(message) {
-      const toast = $("#toast");
-      toast.textContent = message;
-      toast.classList.add("show");
-      clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => toast.classList.remove("show"), 4200);
+    function pct(value, limit) {
+      return Math.max(0, Math.min(100, (value / limit) * 100));
     }
 
     function escapeHtml(value) {
-      return String(value ?? "").replace(/[&<>'"]/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "'":"&#039;", '"':"&quot;" }[char]));
+      return clean(value).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
     }
 
-    $$(".tab-btn").forEach(btn => btn.addEventListener("click", () => goTo(btn.dataset.view)));
-    $$('[data-go]').forEach(btn => btn.addEventListener("click", () => goTo(btn.dataset.go)));
-    $("#themeBtn").addEventListener("click", () => document.body.classList.toggle("dark-theme"));
-    $("#seedBtn").addEventListener("click", seedExample);
-    $("#exportBtn").addEventListener("click", exportCsv);
-    $("#downloadJsonBtn").addEventListener("click", downloadJson);
-    $("#clearBtn").addEventListener("click", () => {
-      if (!confirm("Limpar toda a base local?")) return;
-      state.reports = [];
-      saveReports();
-      renderAll();
-      showToast("Base local limpa.");
+    function buildProjects() {
+      const prepared = prepareRows(state.rows);
+      const projects = state.mode === "planilha" ? buildBySpreadsheet(prepared) : buildByRule(prepared);
+      return projects.sort((a, b) => naturalCompare(a.project, b.project));
+    }
+
+    function render() {
+      state.mode = $("modeSelect").value;
+      const projects = buildProjects();
+      fillProjectFilter(projects);
+
+      const selectedProject = $("projectFilter").value;
+      const selectedStatus = $("statusFilter").value;
+      const term = normalizeKey($("searchInput").value);
+
+      const filteredProjects = projects.map(project => {
+        let series = project.series;
+        if (selectedStatus !== "todos") series = series.filter(serie => serie.status === selectedStatus);
+        if (term) {
+          series = series.map(serie => ({
+            ...serie,
+            items: serie.items.filter(row => normalizeKey(`${row.lote} ${row.projeto} ${row.tipo} ${row.serie_planilha}`).includes(term))
+          })).filter(serie => serie.items.length || normalizeKey(`${serie.name} ${serie.project}`).includes(term));
+        }
+        return { ...project, series };
+      }).filter(project => (selectedProject === "todos" || project.project === selectedProject) && project.series.length);
+
+      renderSummary(projects);
+      renderProjects(filteredProjects);
+      $("sourceNote").innerHTML = `Fonte: <strong>${escapeHtml(state.source)}</strong> • ${nf.format(prepareRows(state.rows).length)} linhas válidas lidas. Modo atual: <strong>${state.mode === "regra" ? "recalcular pela regra 2.000/10" : "usar coluna de série da planilha"}</strong>.`;
+    }
+
+    function fillProjectFilter(projects) {
+      const select = $("projectFilter");
+      const current = select.value || "todos";
+      const options = ["todos", ...projects.map(p => p.project)];
+      const existing = [...select.options].map(opt => opt.value).join("|");
+      if (existing === options.join("|")) return;
+      select.innerHTML = options.map(value => `<option value="${escapeHtml(value)}">${value === "todos" ? "Todos" : escapeHtml(value)}</option>`).join("");
+      select.value = options.includes(current) ? current : "todos";
+    }
+
+    function renderSummary(projects) {
+      const allSeries = projects.flatMap(p => p.series);
+      const total = projects.reduce((sum, p) => sum + p.total, 0);
+      const lots = projects.reduce((sum, p) => sum + p.lots, 0);
+      const needsTest = allSeries.filter(s => s.status === "ensaio").length;
+      const near = allSeries.filter(s => s.status === "proximo").length;
+      const released = allSeries.filter(s => s.status === "liberada").length;
+      const cards = [
+        ["Projetos", projects.length],
+        ["Dormentes produzidos", nf.format(total)],
+        ["Lotes produzidos", nf.format(lots)],
+        ["Séries c/ ensaio obrigatório", nf.format(needsTest)],
+        ["Séries liberadas", nf.format(released)]
+      ];
+      $("summaryGrid").innerHTML = cards.map(([label, value]) => `<article class="kpi"><span>${label}</span><strong>${value}</strong></article>`).join("");
+    }
+
+    function renderProjects(projects) {
+      if (!projects.length) {
+        $("projects").innerHTML = `<div class="empty">Nenhum projeto encontrado com os filtros aplicados.</div>`;
+        return;
+      }
+      $("projects").innerHTML = projects.map(project => renderProjectCard(project)).join("");
+    }
+
+    function renderProjectCard(project) {
+      const statusText = project.needsTest
+        ? `${project.needsTest} série(s) aguardando ensaio`
+        : project.near
+          ? `${project.near} série(s) próxima(s) do ensaio`
+          : "Sem gatilho imediato";
+      return `<article class="project-card">
+        <header class="project-head">
+          <div>
+            <h2 class="project-title">${escapeHtml(project.project)}</h2>
+            <p class="project-meta">${escapeHtml(statusText)}. Após ensaio aprovado, marque a série como liberada para carregamento.</p>
+          </div>
+          <div class="project-stats">
+            <span class="pill dark">${nf.format(project.total)} dormentes</span>
+            <span class="pill">${nf.format(project.lots)} lotes produzidos</span>
+            <span class="pill">${nf.format(project.series.length)} séries/cards</span>
+          </div>
+        </header>
+        <div class="series-grid">${project.series.map(renderSerieCard).join("")}</div>
+      </article>`;
+    }
+
+    function renderSerieCard(serie) {
+      const qtyPct = pct(serie.total, LIMIT_QTY);
+      const lotPct = pct(serie.productiveLots, LIMIT_LOTS);
+      const lastPositive = [...serie.items].reverse().find(row => (row.quantidade || 0) > 0);
+      const candidate = serie.testLotUid
+        ? serie.items.find(row => row._uid === serie.testLotUid)
+        : lastPositive;
+      const candidateLabel = serie.status === "ensaio" || serie.status === "liberada" ? "Lote separado para ensaio" : "Último lote produzido / candidato";
+      const canRelease = serie.closed && serie.status !== "liberada";
+      const canUndo = serie.status === "liberada";
+      return `<section class="serie-card ${serie.status}">
+        <div class="serie-top">
+          <div>
+            <h3 class="serie-name">${escapeHtml(serie.name)}</h3>
+            <div class="serie-sub">${nf.format(serie.productiveLots)} lote(s) produzidos • ${nf.format(serie.total)} dormentes</div>
+          </div>
+          <span class="badge ${serie.status}">${escapeHtml(serie.statusLabel)}</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-row">
+            <div class="progress-label"><span>Dormentes</span><span>${nf.format(serie.total)} / ${nf.format(LIMIT_QTY)}</span></div>
+            <div class="bar"><span style="width:${qtyPct}%"></span></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span>Lotes</span><span>${nf.format(serie.productiveLots)} / ${nf.format(LIMIT_LOTS)}</span></div>
+            <div class="bar"><span style="width:${lotPct}%"></span></div>
+          </div>
+        </div>
+        ${candidate ? `<div class="candidate"><strong>${candidateLabel}:</strong> lote ${escapeHtml(candidate.lote)} • ${formatDate(candidate.data)} • ${nf.format(candidate.quantidade)} dormentes.</div>` : ""}
+        <div class="serie-actions">
+          ${canRelease ? `<button class="mini-btn release" data-action="release" data-key="${escapeHtml(serie.key)}">Marcar ensaio feito e liberar</button>` : ""}
+          ${canUndo ? `<button class="mini-btn" data-action="undo" data-key="${escapeHtml(serie.key)}">Desfazer liberação</button>` : ""}
+          ${serie.status === "conferir" ? `<span class="pill">Série abaixo do gatilho: validar na planilha</span>` : ""}
+        </div>
+        <details ${serie.status === "ensaio" || serie.status === "proximo" ? "open" : ""}>
+          <summary>Ver lotes da série</summary>
+          <table class="lot-table">
+            <thead><tr><th>Data</th><th>Lote</th><th>Tipo</th><th>Qtd.</th><th>Série planilha</th></tr></thead>
+            <tbody>${serie.items.map(row => renderLotRow(row, serie)).join("")}</tbody>
+          </table>
+        </details>
+      </section>`;
+    }
+
+    function renderLotRow(row, serie) {
+      const isTest = row._uid === serie.testLotUid;
+      const isZero = (row.quantidade || 0) <= 0;
+      return `<tr class="${isTest ? "test-lot" : ""} ${isZero ? "zero-lot" : ""}">
+        <td>${formatDate(row.data)}</td>
+        <td>${escapeHtml(row.lote)}${isTest ? `<span class="lot-badge">Ensaio</span>` : ""}</td>
+        <td>${escapeHtml(row.tipo)}</td>
+        <td>${nf.format(row.quantidade || 0)}</td>
+        <td>${escapeHtml(row.serie_planilha || "-")}</td>
+      </tr>`;
+    }
+
+    async function parseWorkbookFile(fileOrBuffer, label) {
+      if (!window.XLSX) throw new Error("Biblioteca XLSX não carregada.");
+      const buffer = fileOrBuffer instanceof ArrayBuffer ? fileOrBuffer : await fileOrBuffer.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array", cellDates: false });
+      const firstSheet = workbook.SheetNames[0];
+      const matrix = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], { header: 1, raw: true, defval: "" });
+      const mapped = mapWorkbookRows(matrix);
+      if (!mapped.length) throw new Error("Não encontrei linhas válidas na planilha.");
+      state.rows = mapped;
+      state.source = label;
+      render();
+    }
+
+    async function tryLoadRepositorySpreadsheet() {
+      state.rows = EMBEDDED_LOTES;
+      state.source = "dados embutidos da planilha enviada";
+      render();
+      if (!window.XLSX) return;
+      try {
+        const response = await fetch(PLANILHA_URL, { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const buffer = await response.arrayBuffer();
+        await parseWorkbookFile(buffer, "Painel de series de DM.xlsx no repositório");
+      } catch (error) {
+        console.info("Usando dados embutidos; não foi possível carregar a planilha do repositório.", error);
+      }
+    }
+
+    $("printBtn").addEventListener("click", () => window.print());
+    $("fileInput").addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try { await parseWorkbookFile(file, file.name); }
+      catch (error) { alert(`Não consegui ler a planilha: ${error.message}`); }
+      finally { event.target.value = ""; }
     });
-    $("#searchInput").addEventListener("input", e => { state.filters.search = e.target.value; renderTable(); });
-    $("#supplierFilter").addEventListener("change", e => { state.filters.supplier = e.target.value; renderTable(); });
-    $("#statusFilter").addEventListener("change", e => { state.filters.status = e.target.value; renderTable(); });
-    $("#pdfInput").addEventListener("change", e => handleFiles(e.target.files));
-    $("#closeModal").addEventListener("click", () => $("#modalBackdrop").classList.remove("show"));
-    $("#modalBackdrop").addEventListener("click", e => { if (e.target.id === "modalBackdrop") e.currentTarget.classList.remove("show"); });
+    ["searchInput", "projectFilter", "statusFilter", "modeSelect"].forEach(id => $(id).addEventListener("input", render));
+    $("resetReleasesBtn").addEventListener("click", () => {
+      if (!confirm("Limpar todas as marcações de séries liberadas neste navegador?")) return;
+      state.releases = {};
+      saveReleases();
+      render();
+    });
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      const key = button.dataset.key;
+      if (button.dataset.action === "release") state.releases[key] = true;
+      if (button.dataset.action === "undo") delete state.releases[key];
+      saveReleases();
+      render();
+    });
 
-    const dropZone = $("#dropZone");
-    ["dragenter", "dragover"].forEach(eventName => dropZone.addEventListener(eventName, e => {
-      e.preventDefault();
-      dropZone.classList.add("dragover");
-    }));
-    ["dragleave", "drop"].forEach(eventName => dropZone.addEventListener(eventName, e => {
-      e.preventDefault();
-      dropZone.classList.remove("dragover");
-    }));
-    dropZone.addEventListener("drop", e => handleFiles(e.dataTransfer.files));
-
-    window.openReport = openReport;
-    renderAll();
+    tryLoadRepositorySpreadsheet();
   </script>
 </body>
 </html>
