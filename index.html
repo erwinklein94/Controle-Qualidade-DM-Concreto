@@ -187,14 +187,16 @@
       padding: 16px;
       box-shadow: var(--shadow);
       display: grid;
-      grid-template-columns: 1.2fr .85fr .85fr .85fr auto;
+      grid-template-columns: repeat(6, minmax(150px, 1fr));
       gap: 12px;
-      align-items: center;
+      align-items: end;
       position: sticky;
       top: 10px;
       z-index: 20;
     }
     .control { display: grid; gap: 6px; }
+    .search-control { grid-column: span 2; }
+    .toolbar > .btn { min-height: 44px; align-self: end; }
     .control label { font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 900; color: var(--muted); }
     .control input, .control select {
       width: 100%;
@@ -338,6 +340,7 @@
 
     @media (max-width: 1100px) {
       .toolbar { grid-template-columns: 1fr 1fr; }
+      .search-control { grid-column: span 2; }
       .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .series-grid { grid-template-columns: 1fr; }
       .hero-inner, .project-head { grid-template-columns: 1fr; }
@@ -348,6 +351,7 @@
       .page { width: min(100% - 20px, 1480px); }
       .hero { padding: 22px; border-radius: 24px; }
       .toolbar { position: static; grid-template-columns: 1fr; }
+      .search-control { grid-column: span 1; }
       .summary-grid { grid-template-columns: 1fr; }
       .series-grid { padding: 12px; }
       .project-head { padding: 16px; }
@@ -377,7 +381,7 @@
           <div>
             <div class="eyebrow">Rumo • Fábrica Cavan • Santa Lúcia/SP</div>
             <h1>Painel de séries de dormentes</h1>
-            <p class="subtitle">Controle visual para somar lotes por projeto, destacar o lote do ensaio de liberação e acompanhar quais séries já podem seguir para carregamento em carretas, agora com identidade visual inspirada na Rumo: azul escuro como base, branco para leitura e verde claro como destaque.</p>
+            <p class="subtitle">Controle visual para somar lotes por projeto e bitola, aplicar um corte de data quando os ensaios antigos já estiverem liberados, destacar o lote do ensaio e acompanhar quais séries podem seguir para carregamento.</p>
           </div>
           <div class="hero-actions">
             <button class="btn primary" id="printBtn">Imprimir / PDF</button>
@@ -407,17 +411,29 @@
     <section class="rule-strip" aria-label="Regra de ensaio">
       <div class="rule"><strong>2.000</strong><span>Dormentes produzidos acumulados disparam ensaio.</span></div>
       <div class="rule"><strong>10 lotes</strong><span>Também disparam ensaio, mesmo abaixo de 2.000 peças.</span></div>
-      <div class="rule"><strong>Último lote</strong><span>O lote que fecha a meta é separado como lote do ensaio.</span></div>
+      <div class="rule"><strong>Projeto + bitola</strong><span>BL e BM são tratados separadamente, mesmo quando o nome do projeto é igual.</span></div>
     </section>
 
     <section class="toolbar" aria-label="Filtros do painel">
-      <div class="control">
-        <label for="searchInput">Buscar lote, projeto ou tipo</label>
-        <input id="searchInput" placeholder="Ex.: 2794, Ferro Norte, Bitola Larga" />
+      <div class="control search-control">
+        <label for="searchInput">Buscar lote, projeto, bitola ou tipo</label>
+        <input id="searchInput" placeholder="Ex.: 2794, Malha Paulista BL, Bitola Mista" />
       </div>
       <div class="control">
-        <label for="projectFilter">Projeto</label>
+        <label for="dateFrom">Data inicial</label>
+        <input id="dateFrom" type="date" />
+      </div>
+      <div class="control">
+        <label for="dateTo">Data final</label>
+        <input id="dateTo" type="date" />
+      </div>
+      <div class="control">
+        <label for="projectFilter">Projeto / bitola</label>
         <select id="projectFilter"><option value="todos">Todos</option></select>
+      </div>
+      <div class="control">
+        <label for="bitolaFilter">Bitola</label>
+        <select id="bitolaFilter"><option value="todos">Todas</option></select>
       </div>
       <div class="control">
         <label for="statusFilter">Status</label>
@@ -444,7 +460,7 @@
     <div class="source-note" id="sourceNote">Carregando dados...</div>
     <section class="summary-grid" id="summaryGrid"></section>
     <section id="projects"></section>
-    <p class="footer-note">Observação: as marcações de “liberada” ficam salvas apenas neste navegador usando armazenamento local. Para um controle oficial multiusuário, o ideal é manter a planilha como base mestre e publicar uma versão atualizada no GitHub Pages.</p>
+    <p class="footer-note">Observação: as marcações de “liberada” ficam salvas apenas neste navegador usando armazenamento local. Use a data inicial para ignorar séries antigas já ensaiadas/liberadas; BL e BM são separados automaticamente pela descrição do tipo de dormente. Para um controle oficial multiusuário, o ideal é manter a planilha como base mestre e publicar uma versão atualizada no GitHub Pages.</p>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -512,6 +528,29 @@
       return key.split(" ").map(part => part[0]).join("").slice(0, 4) || "PRJ";
     }
 
+    function detectBitola(row) {
+      const text = normalizeKey(`${row.tipo || ""} ${row.projeto || ""}`);
+      if (/(^|\b)(BL|BITOLA LARGA|LARGA)(\b|$)/.test(text)) return { codigo: "BL", nome: "Bitola Larga" };
+      if (/(^|\b)(BM|BITOLA MISTA|MISTA)(\b|$)/.test(text)) return { codigo: "BM", nome: "Bitola Mista" };
+      return { codigo: "SB", nome: "Sem bitola identificada" };
+    }
+
+    function projectGroupName(row) {
+      const bitola = row.bitola_codigo ? { codigo: row.bitola_codigo, nome: row.bitola_nome } : detectBitola(row);
+      return `${clean(row.projeto)} • ${bitola.codigo}`;
+    }
+
+    function isValidIsoDate(value) {
+      return /^\d{4}-\d{2}-\d{2}$/.test(clean(value));
+    }
+
+    function dateRangeLabel(from, to) {
+      if (from && to) return `de ${formatDate(from)} até ${formatDate(to)}`;
+      if (from) return `a partir de ${formatDate(from)}`;
+      if (to) return `até ${formatDate(to)}`;
+      return "período completo";
+    }
+
     function normalizeSerieName(value, project) {
       const raw = clean(value);
       if (!raw || raw === "0") return `Série aberta / sem série - ${projectCode(project)}`;
@@ -568,21 +607,28 @@
     }
 
     function rowUid(row, idx) {
-      return `${row.projeto}-${row.lote}-${row.data}-${idx}`;
+      return `${row.projeto_grupo || row.projeto}-${row.tipo || ""}-${row.lote}-${row.data}-${idx}`;
     }
 
     function prepareRows(rows) {
-      return rows.map((row, idx) => ({
-        ...row,
-        _uid: rowUid(row, idx),
-        quantidade: parseQty(row.quantidade),
-        lote: parseQty(row.lote),
-        projeto: clean(row.projeto),
-        tipo: clean(row.tipo),
-        serie_planilha: clean(row.serie_planilha),
-        data: excelDateToISO(row.data),
-        _idx: idx
-      })).filter(row => row.projeto && row.lote);
+      return rows.map((row, idx) => {
+        const prepared = {
+          ...row,
+          quantidade: parseQty(row.quantidade),
+          lote: parseQty(row.lote),
+          projeto: clean(row.projeto),
+          tipo: clean(row.tipo),
+          serie_planilha: clean(row.serie_planilha),
+          data: excelDateToISO(row.data),
+          _idx: idx
+        };
+        const bitola = detectBitola(prepared);
+        prepared.bitola_codigo = bitola.codigo;
+        prepared.bitola_nome = bitola.nome;
+        prepared.projeto_grupo = projectGroupName(prepared);
+        prepared._uid = rowUid(prepared, idx);
+        return prepared;
+      }).filter(row => row.projeto && row.lote);
     }
 
     function sortRows(rows) {
@@ -628,7 +674,7 @@
     }
 
     function buildByRule(rows) {
-      const groups = groupBy(rows, row => row.projeto);
+      const groups = groupBy(rows, row => row.projeto_grupo);
       return Object.entries(groups).map(([project, projectRows]) => {
         const sorted = sortRows(projectRows);
         const series = [];
@@ -664,7 +710,7 @@
     }
 
     function buildBySpreadsheet(rows) {
-      const projectGroups = groupBy(rows, row => row.projeto);
+      const projectGroups = groupBy(rows, row => row.projeto_grupo);
       return Object.entries(projectGroups).map(([project, projectRows]) => {
         const seriesGroups = groupBy(projectRows, row => normalizeSerieName(row.serie_planilha, project));
         const series = Object.entries(seriesGroups).map(([name, items]) => {
@@ -718,15 +764,42 @@
       return clean(value).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
     }
 
-    function buildProjects() {
-      const prepared = prepareRows(state.rows);
-      const projects = state.mode === "planilha" ? buildBySpreadsheet(prepared) : buildByRule(prepared);
+    function getDateFilteredRows(rows) {
+      const from = $("dateFrom")?.value || "";
+      const to = $("dateTo")?.value || "";
+      const bitola = $("bitolaFilter")?.value || "todos";
+      return rows.filter(row => {
+        if (bitola !== "todos" && row.bitola_codigo !== bitola) return false;
+        if ((from || to) && !isValidIsoDate(row.data)) return false;
+        if (from && row.data < from) return false;
+        if (to && row.data > to) return false;
+        return true;
+      });
+    }
+
+    function setDateInputBounds(rows) {
+      const dates = rows.map(row => row.data).filter(isValidIsoDate).sort();
+      if (!dates.length) return;
+      ["dateFrom", "dateTo"].forEach(id => {
+        const el = $(id);
+        if (!el) return;
+        el.min = dates[0];
+        el.max = dates[dates.length - 1];
+      });
+    }
+
+    function buildProjects(rows) {
+      const projects = state.mode === "planilha" ? buildBySpreadsheet(rows) : buildByRule(rows);
       return projects.sort((a, b) => naturalCompare(a.project, b.project));
     }
 
     function render() {
       state.mode = $("modeSelect").value;
-      const projects = buildProjects();
+      const allRows = prepareRows(state.rows);
+      setDateInputBounds(allRows);
+      fillBitolaFilter(allRows);
+      const activeRows = getDateFilteredRows(allRows);
+      const projects = buildProjects(activeRows);
       fillProjectFilter(projects);
 
       const selectedProject = $("projectFilter").value;
@@ -739,7 +812,7 @@
         if (term) {
           series = series.map(serie => ({
             ...serie,
-            items: serie.items.filter(row => normalizeKey(`${row.lote} ${row.projeto} ${row.tipo} ${row.serie_planilha}`).includes(term))
+            items: serie.items.filter(row => normalizeKey(`${row.lote} ${row.projeto} ${row.projeto_grupo} ${row.bitola_codigo} ${row.bitola_nome} ${row.tipo} ${row.serie_planilha}`).includes(term))
           })).filter(serie => serie.items.length || normalizeKey(`${serie.name} ${serie.project}`).includes(term));
         }
         return { ...project, series };
@@ -747,7 +820,9 @@
 
       renderSummary(projects);
       renderProjects(filteredProjects);
-      $("sourceNote").innerHTML = `Fonte: <strong>${escapeHtml(state.source)}</strong> • ${nf.format(prepareRows(state.rows).length)} linhas válidas lidas. Modo atual: <strong>${state.mode === "regra" ? "recalcular pela regra 2.000/10" : "usar coluna de série da planilha"}</strong>.`;
+      const periodo = dateRangeLabel($("dateFrom").value, $("dateTo").value);
+      const bitola = $("bitolaFilter").value === "todos" ? "todas as bitolas" : $("bitolaFilter").selectedOptions[0]?.textContent || $("bitolaFilter").value;
+      $("sourceNote").innerHTML = `Fonte: <strong>${escapeHtml(state.source)}</strong> • ${nf.format(activeRows.length)} de ${nf.format(allRows.length)} linhas válidas no recorte. Período: <strong>${escapeHtml(periodo)}</strong> • Bitola: <strong>${escapeHtml(bitola)}</strong> • Modo atual: <strong>${state.mode === "regra" ? "recalcular pela regra 2.000/10" : "usar coluna de série da planilha"}</strong>.`;
     }
 
     function fillProjectFilter(projects) {
@@ -760,6 +835,20 @@
       select.value = options.includes(current) ? current : "todos";
     }
 
+
+    function fillBitolaFilter(rows) {
+      const select = $("bitolaFilter");
+      if (!select) return;
+      const current = select.value || "todos";
+      const bitolas = [...new Map(rows.map(row => [row.bitola_codigo, row.bitola_nome])).entries()]
+        .sort((a, b) => naturalCompare(a[0], b[0]));
+      const options = [["todos", "Todas"], ...bitolas.map(([codigo, nome]) => [codigo, `${codigo} - ${nome}`])];
+      const existing = [...select.options].map(opt => opt.value).join("|");
+      if (existing === options.map(([value]) => value).join("|")) return;
+      select.innerHTML = options.map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join("");
+      select.value = options.some(([value]) => value === current) ? current : "todos";
+    }
+
     function renderSummary(projects) {
       const allSeries = projects.flatMap(p => p.series);
       const total = projects.reduce((sum, p) => sum + p.total, 0);
@@ -768,7 +857,7 @@
       const near = allSeries.filter(s => s.status === "proximo").length;
       const released = allSeries.filter(s => s.status === "liberada").length;
       const cards = [
-        ["Projetos", projects.length],
+        ["Projetos / bitolas", projects.length],
         ["Dormentes produzidos", nf.format(total)],
         ["Lotes produzidos", nf.format(lots)],
         ["Séries c/ ensaio obrigatório", nf.format(needsTest)],
@@ -795,7 +884,7 @@
         <header class="project-head">
           <div>
             <h2 class="project-title">${escapeHtml(project.project)}</h2>
-            <p class="project-meta">${escapeHtml(statusText)}. Após ensaio aprovado, marque a série como liberada para carregamento.</p>
+            <p class="project-meta">${escapeHtml(statusText)}. A contagem deste card é independente para esta combinação de projeto + bitola. Após ensaio aprovado, marque a série como liberada para carregamento.</p>
           </div>
           <div class="project-stats">
             <span class="pill dark">${nf.format(project.total)} dormentes</span>
@@ -844,7 +933,7 @@
         <details ${serie.status === "ensaio" || serie.status === "proximo" ? "open" : ""}>
           <summary>Ver lotes da série</summary>
           <table class="lot-table">
-            <thead><tr><th>Data</th><th>Lote</th><th>Tipo</th><th>Qtd.</th><th>Série planilha</th></tr></thead>
+            <thead><tr><th>Data</th><th>Lote</th><th>Bitola</th><th>Tipo</th><th>Qtd.</th><th>Série planilha</th></tr></thead>
             <tbody>${serie.items.map(row => renderLotRow(row, serie)).join("")}</tbody>
           </table>
         </details>
@@ -857,6 +946,7 @@
       return `<tr class="${isTest ? "test-lot" : ""} ${isZero ? "zero-lot" : ""}">
         <td>${formatDate(row.data)}</td>
         <td>${escapeHtml(row.lote)}${isTest ? `<span class="lot-badge">Ensaio</span>` : ""}</td>
+        <td>${escapeHtml(row.bitola_codigo)} - ${escapeHtml(row.bitola_nome)}</td>
         <td>${escapeHtml(row.tipo)}</td>
         <td>${nf.format(row.quantidade || 0)}</td>
         <td>${escapeHtml(row.serie_planilha || "-")}</td>
@@ -899,7 +989,7 @@
       catch (error) { alert(`Não consegui ler a planilha: ${error.message}`); }
       finally { event.target.value = ""; }
     });
-    ["searchInput", "projectFilter", "statusFilter", "modeSelect"].forEach(id => $(id).addEventListener("input", render));
+    ["searchInput", "dateFrom", "dateTo", "projectFilter", "bitolaFilter", "statusFilter", "modeSelect"].forEach(id => $(id).addEventListener("input", render));
     $("resetReleasesBtn").addEventListener("click", () => {
       if (!confirm("Limpar todas as marcações de séries liberadas neste navegador?")) return;
       state.releases = {};
