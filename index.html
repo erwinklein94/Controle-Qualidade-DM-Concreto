@@ -72,7 +72,7 @@
       position: relative;
       z-index: 1;
       display: grid;
-      grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr);
+      grid-template-columns: 1fr;
       gap: 24px;
       align-items: stretch;
     }
@@ -534,12 +534,42 @@
     .risk-mid { color: #9a5b00; font-weight: 950; }
     .risk-low { color: var(--ok); font-weight: 950; }
 
+    .insight-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .insight-card {
+      display: grid;
+      gap: 6px;
+      min-height: 96px;
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #f8fbff, #ffffff);
+      border: 1px solid var(--line);
+    }
+    .insight-card span { color: var(--muted); font-size: .76rem; font-weight: 950; text-transform: uppercase; letter-spacing: .06em; }
+    .insight-card strong { color: var(--brand); font-size: clamp(1.28rem, 2.1vw, 2rem); letter-spacing: -.045em; line-height: 1.05; }
+    .insight-card small { color: var(--muted); line-height: 1.35; }
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: .72rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: .045em;
+      white-space: nowrap;
+    }
+    .status-chip.alta { color: #9f1239; background: #ffe4e6; }
+    .status-chip.media { color: #9a5b00; background: #fff5d8; }
+    .status-chip.baixa { color: var(--ok); background: var(--ok-bg); }
+    .status-chip.neutra { color: var(--muted); background: var(--info-bg); }
+
     @media (max-width: 1100px) {
       .toolbar, .dashboard-toolbar, .rejection-toolbar { grid-template-columns: 1fr 1fr; }
       .search-control { grid-column: span 2; }
       .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .series-grid { grid-template-columns: 1fr; }
-      .hero-inner, .project-head, .dashboard-head, .dashboard-layout { grid-template-columns: 1fr; }
+      .hero-inner, .project-head, .dashboard-head, .dashboard-layout, .insight-grid { grid-template-columns: 1fr; }
       .rule-strip { grid-template-columns: 1fr; }
       .project-stats { justify-content: flex-start; }
     }
@@ -585,21 +615,6 @@
             <input class="hide" id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
           </div>
         </div>
-        <aside class="hero-brand" aria-label="Identidade visual Rumo">
-          <div class="brand-lockup">
-            <div class="brand-kicker">Identidade visual</div>
-            <div class="brand-word">rumo</div>
-            <div class="brand-sub">Azul escuro em primeiro plano, branco como base de leitura e verde claro como cor de destaque.</div>
-          </div>
-          <div class="brand-tiles">
-            <span class="tile"></span>
-            <span class="tile"></span>
-            <span class="tile"></span>
-            <span class="tile"></span>
-            <span class="tile"></span>
-            <span class="tile"></span>
-          </div>
-        </aside>
       </div>
     </section>
 
@@ -673,8 +688,8 @@
       <div class="dashboard-panel">
         <header class="dashboard-head">
           <div>
-            <h2>Dash board de produção semanal</h2>
-            <p>Acompanhe a quantidade produzida por projeto no período selecionado. Os filtros vêm pré-preenchidos com a última semana disponível na planilha para facilitar o fechamento semanal.</p>
+            <h2>Dash board de produção e qualidade</h2>
+            <p>Acompanhe a produção semanal junto com os principais sinais de refugo/reprova no mesmo período. Os filtros vêm pré-preenchidos com a última semana disponível na planilha para facilitar o fechamento semanal.</p>
           </div>
           <div class="dashboard-mark">rumo</div>
         </header>
@@ -708,6 +723,21 @@
             <h3>Produção semanal - toda a planilha</h3>
             <p class="card-note">Visão geral por semana, somando todos os projetos e todas as bitolas da planilha carregada.</p>
             <div id="weeklyChart"></div>
+          </article>
+          <article class="dashboard-card">
+            <h3>Indicadores de refugo no período</h3>
+            <p class="card-note">Resumo rápido das reprovas no mesmo filtro de data e projeto do dash board.</p>
+            <div id="dashboardRejectionHighlights"></div>
+          </article>
+          <article class="dashboard-card">
+            <h3>Motivos que mais puxam reprova</h3>
+            <p class="card-note">Top motivos comuns para priorizar ação corretiva na produção.</p>
+            <div id="dashboardTopReasons"></div>
+          </article>
+          <article class="dashboard-card wide-card">
+            <h3>Lotes críticos para marcar e atacar</h3>
+            <p class="card-note">Ranking dos lotes com mais refugos/reprovas no recorte do dash board, incluindo taxa quando há produção do lote na planilha.</p>
+            <div id="dashboardCriticalLots"></div>
           </article>
         </section>
       </div>
@@ -772,7 +802,7 @@
       </div>
     </section>
 
-    <p class="footer-note">Observação: as marcações de “liberada” ficam salvas apenas neste navegador usando armazenamento local. Use a data inicial para ignorar séries antigas já ensaiadas/liberadas; BL e BM são separados automaticamente pela descrição do tipo de dormente. A aba Dash board usa filtros próprios, pré-preenchidos com a última semana disponível na planilha, para acompanhar produção semanal por projeto. A aba Refugos / Reprovas usa os registros do bloco de reprovados da planilha e agrupa os motivos automaticamente. Para um controle oficial multiusuário, o ideal é manter a planilha como base mestre e publicar uma versão atualizada no GitHub Pages.</p>
+    <p class="footer-note">Observação: as marcações de “liberada” ficam salvas apenas neste navegador usando armazenamento local. Use a data inicial para ignorar séries antigas já ensaiadas/liberadas; BL e BM são separados automaticamente pela descrição do tipo de dormente. A aba Dash board usa filtros próprios, pré-preenchidos com a última semana disponível na planilha, para acompanhar produção semanal por projeto e destacar também taxa de refugo, motivo líder e lotes críticos do mesmo recorte. A aba Refugos / Reprovas usa os registros do bloco de reprovados da planilha e agrupa os motivos automaticamente. Para um controle oficial multiusuário, o ideal é manter a planilha como base mestre e publicar uma versão atualizada no GitHub Pages.</p>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -1294,27 +1324,62 @@
       })).sort((a, b) => a.weekStart.localeCompare(b.weekStart));
     }
 
-    function renderDashboard(rows) {
+    function getDashboardFilteredRejectionRows(rows) {
+      const from = $("dashDateFrom")?.value || "";
+      const to = $("dashDateTo")?.value || "";
+      const project = $("dashProjectFilter")?.value || "todos";
+      return rows.filter(row => {
+        if ((from || to) && !isValidIsoDate(row.data)) return false;
+        if (from && row.data < from) return false;
+        if (to && row.data > to) return false;
+        if (project !== "todos" && row.projeto_grupo !== project) return false;
+        return true;
+      });
+    }
+
+    function renderDashboard(rows, rejectionRows = []) {
       const filteredRows = getDashboardFilteredRows(rows);
+      const filteredRejections = getDashboardFilteredRejectionRows(rejectionRows);
       const projectTotals = aggregateByProject(filteredRows);
       const total = filteredRows.reduce((sum, row) => sum + (row.quantidade || 0), 0);
       const lots = filteredRows.length;
       const projectsCount = projectTotals.length;
-      const avgPerDay = getProducedDays(filteredRows).length ? Math.round(total / getProducedDays(filteredRows).length) : 0;
+      const producedDays = getProducedDays(filteredRows);
+      const avgPerDay = producedDays.length ? Math.round(total / producedDays.length) : 0;
+      const reasonTotals = aggregateRejectionsByReason(filteredRejections);
+      const criticalLots = aggregateRejectionsByLot(filteredRejections, filteredRows);
+      const affectedLots = new Set(filteredRejections.map(row => `${row.projeto_grupo}|${row.lote}`)).size;
+      const rejectionRate = total ? (filteredRejections.length / total) * 100 : 0;
+      const topReason = reasonTotals[0]?.reason || "-";
+      const topLot = criticalLots[0] ? `${criticalLots[0].lote} • ${criticalLots[0].project}` : "-";
       const period = dateRangeLabel($("dashDateFrom")?.value || "", $("dashDateTo")?.value || "");
       const projectLabel = $("dashProjectFilter")?.value === "todos" ? "todos os projetos" : $("dashProjectFilter")?.value;
 
       $("dashboardSummaryGrid").innerHTML = [
         ["Produção no período", nf.format(total)],
         ["Lotes produzidos", nf.format(lots)],
-        ["Projetos / bitolas", nf.format(projectsCount)],
-        ["Média por dia produtivo", nf.format(avgPerDay)],
-        ["Período", escapeHtml(period)]
+        ["Refugos / reprovas", nf.format(filteredRejections.length)],
+        ["Taxa de refugo", `${rejectionRate.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%`],
+        ["Lotes afetados", nf.format(affectedLots)],
+        ["Motivo líder", escapeHtml(topReason)],
+        ["Lote crítico", escapeHtml(topLot)],
+        ["Média por dia produtivo", nf.format(avgPerDay)]
       ].map(([label, value]) => `<article class="kpi"><span>${label}</span><strong>${value}</strong></article>`).join("");
 
-      $("dashboardNote").innerHTML = `Fonte: <strong>${escapeHtml(state.source)}</strong> • Filtro do dash board: <strong>${escapeHtml(period)}</strong> • Projeto: <strong>${escapeHtml(projectLabel)}</strong>.`;
+      $("dashboardNote").innerHTML = `Fonte: <strong>${escapeHtml(state.source)}</strong> • Filtro do dash board: <strong>${escapeHtml(period)}</strong> • Projeto: <strong>${escapeHtml(projectLabel)}</strong> • Refugos no mesmo recorte: <strong>${nf.format(filteredRejections.length)}</strong>.`;
       renderProductionByProject(projectTotals);
       renderWeeklyChart(aggregateWeekly(rows));
+      renderDashboardRejectionHighlights({
+        filteredRejections,
+        total,
+        rejectionRate,
+        affectedLots,
+        reasonTotals,
+        criticalLots,
+        producedDays
+      });
+      renderDashboardTopReasons(reasonTotals, filteredRejections.length);
+      renderDashboardCriticalLots(criticalLots);
     }
 
     function getProducedDays(rows) {
@@ -1357,6 +1422,92 @@
           </div>`;
         }).join("")}
       </div></div>`;
+    }
+
+    function dashboardPriority(item) {
+      if (!item) return { label: "Sem dados", className: "neutra" };
+      if (item.total >= 5 || (item.rate !== null && item.rate >= 2)) return { label: "Alta", className: "alta" };
+      if (item.total >= 2 || (item.rate !== null && item.rate >= 1)) return { label: "Média", className: "media" };
+      return { label: "Baixa", className: "baixa" };
+    }
+
+    function renderDashboardRejectionHighlights(summary) {
+      const container = $("dashboardRejectionHighlights");
+      if (!container) return;
+      const topReason = summary.reasonTotals[0];
+      const topLot = summary.criticalLots[0];
+      const priority = dashboardPriority(topLot);
+      if (!summary.filteredRejections.length) {
+        container.innerHTML = `<div class="empty">Nenhum refugo/reprova no período e projeto selecionados.</div>`;
+        return;
+      }
+      container.innerHTML = `<div class="insight-grid">
+        <div class="insight-card">
+          <span>Taxa de refugo</span>
+          <strong>${summary.rejectionRate.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%</strong>
+          <small>${nf.format(summary.filteredRejections.length)} ocorrência(s) sobre ${nf.format(summary.total)} dormentes produzidos.</small>
+        </div>
+        <div class="insight-card">
+          <span>Lotes afetados</span>
+          <strong>${nf.format(summary.affectedLots)}</strong>
+          <small>${summary.producedDays.length ? `${nf.format(summary.producedDays.length)} dia(s) produtivo(s) no filtro.` : "Sem produção positiva no filtro."}</small>
+        </div>
+        <div class="insight-card">
+          <span>Motivo que mais aparece</span>
+          <strong>${escapeHtml(topReason?.reason || "-")}</strong>
+          <small>${topReason ? `${nf.format(topReason.total)} ocorrência(s) em ${nf.format(topReason.lots)} lote(s).` : "Sem motivo no recorte."}</small>
+        </div>
+        <div class="insight-card">
+          <span>Lote para marcar</span>
+          <strong>${topLot ? escapeHtml(topLot.lote) : "-"}</strong>
+          <small>${topLot ? `${escapeHtml(topLot.project)} • ${nf.format(topLot.total)} ocorrência(s) • prioridade ${priority.label.toLowerCase()}.` : "Sem lote crítico no recorte."}</small>
+        </div>
+      </div>`;
+    }
+
+    function renderDashboardTopReasons(reasonTotals, grandTotal) {
+      const container = $("dashboardTopReasons");
+      if (!container) return;
+      if (!reasonTotals.length) {
+        container.innerHTML = `<div class="empty">Nenhum motivo de refugo/reprova no recorte do dash board.</div>`;
+        return;
+      }
+      const max = Math.max(...reasonTotals.map(item => item.total), 1);
+      container.innerHTML = `<div class="reason-list">
+        ${reasonTotals.slice(0, 6).map(item => {
+          const share = grandTotal ? (item.total / grandTotal) * 100 : 0;
+          return `<div class="reason-row">
+            <div><span class="reason-name">${escapeHtml(item.reason)}</span><span class="detail-muted">${nf.format(item.lots)} lote(s) afetado(s)</span></div>
+            <div class="reason-share"><span class="production-bar"><span style="width:${pct(item.total, max)}%"></span></span></div>
+            <div class="reason-count">${nf.format(item.total)} <span class="detail-muted">${share.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%</span></div>
+          </div>`;
+        }).join("")}
+      </div>`;
+    }
+
+    function renderDashboardCriticalLots(lotTotals) {
+      const container = $("dashboardCriticalLots");
+      if (!container) return;
+      if (!lotTotals.length) {
+        container.innerHTML = `<div class="empty">Nenhum lote com refugo/reprova no recorte do dash board.</div>`;
+        return;
+      }
+      const rows = lotTotals.slice(0, 12);
+      container.innerHTML = `<div class="rejection-table-wrap"><table class="rejection-table">
+        <thead><tr><th>Prioridade</th><th>Lote</th><th>Projeto / bitola</th><th>Motivo líder</th><th>Taxa</th><th>Refugos</th></tr></thead>
+        <tbody>${rows.map(item => {
+          const priority = dashboardPriority(item);
+          const rateText = item.rate === null ? "-" : `${item.rate.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%`;
+          return `<tr>
+            <td><span class="status-chip ${priority.className}">${priority.label}</span></td>
+            <td><span class="lot-pill">${escapeHtml(item.lote)}</span></td>
+            <td><strong>${escapeHtml(item.project)}</strong><span class="detail-muted">Molde(s): ${escapeHtml(item.molds.join(", ") || "-")}</span></td>
+            <td>${escapeHtml(item.reason)}<span class="detail-muted">${nf.format(item.reasonCount)} ocorrência(s) do motivo líder</span></td>
+            <td><span class="${rateClass(item.rate)}">${rateText}</span></td>
+            <td><strong>${nf.format(item.total)}</strong></td>
+          </tr>`;
+        }).join("")}</tbody>
+      </table></div>`;
     }
 
 
@@ -1627,7 +1778,7 @@
 
       renderSummary(projects);
       renderProjects(filteredProjects);
-      renderDashboard(allRows);
+      renderDashboard(allRows, allRejectionRows);
       renderRejectionDashboard(allRejectionRows, allRows);
       const periodo = dateRangeLabel($("dateFrom").value, $("dateTo").value);
       const bitola = $("bitolaFilter").value === "todos" ? "todas as bitolas" : $("bitolaFilter").selectedOptions[0]?.textContent || $("bitolaFilter").value;

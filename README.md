@@ -28,12 +28,14 @@ Aba principal para controlar as séries de produção, ensaio e liberação para
 
 ### Dash board
 
-Aba para acompanhar a **produção semanal**.
+Aba para acompanhar a **produção semanal** junto com os **principais indicadores de refugo/reprova**.
 
 - Os filtros de **Data inicial** e **Data final** vêm pré-preenchidos com a última semana disponível na planilha carregada.
-- O filtro **Projeto / bitola** permite ver a produção semanal de um projeto específico ou de todos.
+- O filtro **Projeto / bitola** permite ver a produção semanal e os refugos de um projeto específico ou de todos.
 - A tabela **Produção por projeto no período** mostra a quantidade produzida por cada combinação de projeto + bitola.
 - O gráfico **Produção semanal - toda a planilha** soma todos os projetos e mostra a evolução por semana.
+- Os cards de qualidade mostram **refugos/reprovas**, **taxa de refugo**, **lotes afetados**, **motivo líder** e **lote crítico** no mesmo recorte do dash board.
+- As tabelas **Motivos que mais puxam reprova** e **Lotes críticos para marcar e atacar** ajudam a priorizar ações corretivas.
 
 ## Filtros importantes na aba Séries
 
@@ -58,4 +60,5 @@ Aba para acompanhar a **produção semanal**.
 - Leitura do bloco `REPROVADOS - CAVAN SANTA LUCIA` da planilha.
 - Filtros por projeto/bitola, período, motivo comum e lote.
 - Indicadores, ranking de motivos, visão por lote e tabela detalhada das ocorrências.
+- Dash board atualizado com indicadores de refugo/reprova no mesmo filtro de produção: taxa, motivo líder, lotes afetados e lotes críticos.
 - A planilha atualizada deve permanecer no repositório como `Painel de series de DM.xlsx`.
