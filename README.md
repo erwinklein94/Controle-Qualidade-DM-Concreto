@@ -62,3 +62,8 @@ Aba para acompanhar a **produção semanal** junto com os **principais indicador
 - Indicadores, ranking de motivos, visão por lote e tabela detalhada das ocorrências.
 - Dash board atualizado com indicadores de refugo/reprova no mesmo filtro de produção: taxa, motivo líder, lotes afetados e lotes críticos.
 - A planilha atualizada deve permanecer no repositório como `Painel de series de DM.xlsx`.
+
+
+## Atualização do dashboard
+
+A aba Dash board compara produção, refugos/reprovas e taxa de refugo dentro do período e projeto selecionados. A planilha padrão do repositório foi atualizada para `Painel de series de DM.xlsx`.
