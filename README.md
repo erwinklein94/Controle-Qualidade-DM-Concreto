@@ -50,3 +50,12 @@ Aba para acompanhar a **produção semanal**.
 - O lote que fecha a meta é destacado como **lote do ensaio**.
 - Após o ensaio aprovado, clique em **Marcar ensaio feito e liberar** para indicar que a série está liberada para carregamento em carretas.
 - Essa marcação fica salva no navegador do usuário.
+
+
+## Atualização incluída
+
+- Nova aba **Refugos / Reprovas** no `index.html`.
+- Leitura do bloco `REPROVADOS - CAVAN SANTA LUCIA` da planilha.
+- Filtros por projeto/bitola, período, motivo comum e lote.
+- Indicadores, ranking de motivos, visão por lote e tabela detalhada das ocorrências.
+- A planilha atualizada deve permanecer no repositório como `Painel de series de DM.xlsx`.
